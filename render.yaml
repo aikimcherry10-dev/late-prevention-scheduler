@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: late-prevention-scheduler
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    region: singapore
+    envVars:
+      - key: ODSAY_API_KEY
+        sync: false
+      - key: KAKAO_REST_API_KEY
+        sync: false
+      - key: KAKAO_JS_API_KEY
+        sync: false
