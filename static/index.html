@@ -180,11 +180,11 @@ input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0
 <body>
 
 <header>
-  <div class="logo-icon">ST</div>
-  <span class="logo-title">LATE PREVENTION</span>
+  <div class="logo-icon">⏰</div>
+  <span class="logo-title">지각 방지 스케줄러</span>
   <div class="header-right">
     <span id="route-badge" class="hbadge badge-yellow" style="display:none">경로 계산 중...</span>
-    <span id="api-badge" class="hbadge badge-green">LIVE SERVICES</span>
+    <span id="api-badge" class="hbadge badge-green">서비스 정상</span>
     <span id="clock"></span>
   </div>
 </header>
@@ -194,40 +194,40 @@ input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0
   <!-- ── 사이드바 ── -->
   <aside>
     <div class="ss">
-      <div class="stitle">ROUTE SETTINGS</div>
+      <div class="stitle">경로 설정</div>
 
       <!-- 지도 클릭 모드 -->
       <div class="map-mode-bar">
-        <button class="mode-btn" id="mode-none" onclick="setMode('none')">Default</button>
-        <button class="mode-btn" id="mode-origin" onclick="setMode('origin')">Set Origin</button>
-        <button class="mode-btn" id="mode-dest" onclick="setMode('dest')">Set Destiny</button>
+        <button class="mode-btn" id="mode-none" onclick="setMode('none')">일반 모드</button>
+        <button class="mode-btn" id="mode-origin" onclick="setMode('origin')">출발지 선택</button>
+        <button class="mode-btn" id="mode-dest" onclick="setMode('dest')">목적지 선택</button>
       </div>
 
       <!-- 이동 수단 모드 -->
       <div class="map-mode-bar" style="margin-bottom: 24px;">
-        <button class="mode-btn travel active" id="tmode-car" onclick="setTravelMode('car')">Car</button>
-        <button class="mode-btn travel" id="tmode-transit" onclick="setTravelMode('transit')">Public</button>
-        <button class="mode-btn travel" id="tmode-walk" onclick="setTravelMode('walk')">Walk</button>
-        <button class="mode-btn travel" id="tmode-bike" onclick="setTravelMode('bike')">Bike</button>
+        <button class="mode-btn travel active" id="tmode-car" onclick="setTravelMode('car')">자동차</button>
+        <button class="mode-btn travel" id="tmode-transit" onclick="setTravelMode('transit')">대중교통</button>
+        <button class="mode-btn travel" id="tmode-walk" onclick="setTravelMode('walk')">도보</button>
+        <button class="mode-btn travel" id="tmode-bike" onclick="setTravelMode('bike')">자전거</button>
       </div>
 
       <div class="fg">
-        <label>Origin</label>
+        <label>출발지</label>
         <div class="iw">
-          <input type="text" id="origin" placeholder="Search address or click on map"/>
-          <button class="gps-btn" id="gps-btn" onclick="useGPS()" title="Use Current Location">GPS</button>
+          <input type="text" id="origin" placeholder="주소를 입력하거나 지도에서 직접 클릭하세요"/>
+          <button class="gps-btn" id="gps-btn" onclick="useGPS()" title="현재 위치 사용">GPS</button>
         </div>
       </div>
 
       <div class="fg">
-        <label>Destiny</label>
+        <label>목적지</label>
         <div class="iw">
-          <input type="text" id="dest" placeholder="Search address or click on map"/>
+          <input type="text" id="dest" placeholder="주소를 입력하거나 지도에서 직접 클릭하세요"/>
         </div>
       </div>
 
       <div class="fg">
-        <label>Appointment Time</label>
+        <label>약속 시각</label>
         <div class="iw">
           <input type="datetime-local" id="appt"/>
         </div>
@@ -235,37 +235,37 @@ input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0
 
       <div class="row2">
         <div class="fg" style="margin:0">
-          <label>Preparation (min)</label>
+          <label>준비 시간 (분)</label>
           <div class="iw"><input type="number" id="prep" value="20" min="0" max="120"/></div>
         </div>
         <div class="fg" style="margin:0">
-          <label>Lateness Habit (min)</label>
+          <label>지각 습관 (분)</label>
           <div class="iw"><input type="number" id="bias" value="5" min="0" max="60"/></div>
         </div>
       </div>
 
-      <div class="stitle" style="margin-top: 24px;">NOTIFICATION SETTINGS</div>
+      <div class="stitle" style="margin-top: 24px;">알림 설정</div>
       <div class="row2">
         <div class="fg" style="margin:0">
-          <label>1st Reminder (min before)</label>
+          <label>1차 리마인드 (분 전)</label>
           <div class="iw"><input type="number" id="alarm-offset-1" value="10" min="1" max="60"/></div>
         </div>
         <div class="fg" style="margin:0">
-          <label>2nd Reminder (min before)</label>
+          <label>2차 리마인드 (분 전)</label>
           <div class="iw"><input type="number" id="alarm-offset-2" value="5" min="1" max="60"/></div>
         </div>
       </div>
 
       <div class="btn-group">
-        <button class="btn btn-primary" id="btn-calc" onclick="calculate()">Calculate</button>
-        <button class="btn btn-ghost" onclick="fillDemo()">Demo</button>
+        <button class="btn btn-primary" id="btn-calc" onclick="calculate()">길찾기 및 계산</button>
+        <button class="btn btn-ghost" onclick="fillDemo()">데모 데이터</button>
       </div>
     </div>
 
     <!-- 결과 -->
     <div id="result-section">
       <div class="ss" style="padding-top:20px">
-        <div class="stitle">ANALYSIS RESULTS</div>
+        <div class="stitle">분석 결과</div>
         <div class="prob-banner" id="prob-banner">
           <div class="prob-ring">
             <svg viewBox="0 0 72 72" width="72" height="72">
@@ -274,7 +274,7 @@ input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0
             </svg>
             <div class="prob-center">
               <div class="prob-pct" id="prob-pct">0%</div>
-              <div class="prob-lbl">PROB.</div>
+              <div class="prob-lbl">지각 확률</div>
             </div>
           </div>
           <div class="prob-info">
@@ -285,26 +285,26 @@ input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0
       </div>
 
       <div class="chips">
-        <div class="chip"><div class="clabel">Departure</div><div class="cval" id="c-dep">—</div></div>
-        <div class="chip"><div class="clabel">Arrival</div><div class="cval" id="c-arr">—</div></div>
-        <div class="chip"><div class="clabel">Travel Time</div><div class="cval" id="c-travel">—</div></div>
-        <div class="chip"><div class="clabel">Time Remaining</div><div class="cval" id="c-remain">—</div></div>
+        <div class="chip"><div class="clabel">추천 출발 시각</div><div class="cval" id="c-dep">—</div></div>
+        <div class="chip"><div class="clabel">예상 도착 시각</div><div class="cval" id="c-arr">—</div></div>
+        <div class="chip"><div class="clabel">이동 소요 시간</div><div class="cval" id="c-travel">—</div></div>
+        <div class="chip"><div class="clabel">출발까지 남은 시간</div><div class="cval" id="c-remain">—</div></div>
       </div>
 
       <!-- ODsay 환승 스텝 렌더링 컨테이너 -->
       <div id="transit-steps-container" style="display: none; padding: 20px 20px 0;">
-        <div style="font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em;">Public Transit Routes</div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em;">대중교통 상세 경로</div>
         <div id="transit-steps-list" style="display:flex; flex-direction:column; gap:8px;"></div>
       </div>
 
       <div style="padding: 16px 20px 0;">
         <button id="btn-kakaomap" class="btn btn-secondary" style="width: 100%; background: #FEE500; color: #000; border: none; font-weight: bold; border-radius: 8px;" onclick="openKakaoMap()">
-          View Details on KakaoMap
+          카카오맵으로 자세히 보기
         </button>
       </div>
 
       <div class="ss" style="padding-top:20px">
-        <div class="stitle">Departure Time Comparison</div>
+        <div class="stitle">출발 시점별 지각 확률 비교</div>
         <div class="sim-list" id="sim-list"></div>
       </div>
     </div>
@@ -326,7 +326,7 @@ input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0
       <div class="ms-row"><span>거리</span><span id="ms-dist">—</span></div>
       <div class="ms-row"><span>도착 예정</span><span id="ms-arr">—</span></div>
     </div>
-    <div class="map-card" id="map-hint">Click on map to select origin</div>
+    <div class="map-card" id="map-hint">지도에서 출발지를 클릭하세요</div>
   </div>
 
 </div>
@@ -382,8 +382,8 @@ function setMode(m) {
     document.getElementById('mode-'+id).classList.toggle('active', id === m);
   });
   const hint = document.getElementById('map-hint');
-  if (m === 'origin') { hint.textContent = '🟢 클릭하여 출발지 선택'; hint.style.display='block'; }
-  else if (m === 'dest') { hint.textContent = '🔴 클릭하여 목적지 선택'; hint.style.display='block'; }
+  if (m === 'origin') { hint.textContent = '출발지를 선택하세요'; hint.style.display='block'; }
+  else if (m === 'dest') { hint.textContent = '목적지를 선택하세요'; hint.style.display='block'; }
   else { hint.style.display='none'; }
 }
 setMode('none');
