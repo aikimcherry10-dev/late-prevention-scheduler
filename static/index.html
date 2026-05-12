@@ -9,54 +9,63 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 :root {
-  --bg:#0d1117; --s1:#161b26; --s2:#1c2233; --border:#232d42;
-  --accent:#4f8cff; --a2:#7c5cfc; --green:#22d072;
-  --yellow:#f5a623; --orange:#ff6b35; --red:#ff3b3b;
-  --text:#e8edf8; --muted:#6b7fa8; --r:14px; --sidebar:390px;
+  --bg: #f5f7fa;
+  --s1: #ffffff;
+  --s2: #f8fafc;
+  --border: #e5e9f0;
+  --accent: #2563eb;
+  --a2: #4f46e5;
+  --green: #10b981;
+  --yellow: #f59e0b;
+  --orange: #f97316;
+  --red: #ef4444;
+  --text: #1e293b;
+  --muted: #64748b;
+  --r: 12px;
+  --sidebar: 380px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
 body{font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
 
 /* Header */
-header{height:56px;min-height:56px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;z-index:1000;position:relative;}
-.logo-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--a2));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
-.logo-title{font-size:16px;font-weight:700;}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
-#clock{font-size:13px;color:var(--muted);}
-.hbadge{font-size:11px;padding:3px 10px;border-radius:20px;}
-.badge-green{background:rgba(34,208,114,.15);color:var(--green);border:1px solid rgba(34,208,114,.3);}
-.badge-yellow{background:rgba(245,166,35,.12);color:var(--yellow);border:1px solid rgba(245,166,35,.3);}
+header{height:56px;min-height:56px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;z-index:1000;position:relative;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--a2));display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;flex-shrink:0;}
+.logo-title{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.02em;}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+#clock{font-size:13px;color:var(--muted);font-weight:500;}
+.hbadge{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600;}
+.badge-green{background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);}
+.badge-yellow{background:rgba(245,158,11,0.1);color:var(--yellow);border:1px solid rgba(245,158,11,0.2);}
 
 /* Body */
 .body-wrap{flex:1;display:flex;overflow:hidden;}
 
 /* Sidebar */
 aside{width:var(--sidebar);min-width:var(--sidebar);background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;z-index:100;}
-aside::-webkit-scrollbar{width:4px;}
+aside::-webkit-scrollbar{width:6px;}
 aside::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-.ss{padding:18px 18px 0;}
+.ss{padding:20px 20px 0;}
 .ss:last-child{padding-bottom:24px;}
-.stitle{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.stitle{font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 
 /* Form */
-.fg{margin-bottom:12px;}
-label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px;}
-.iw{position:relative;display:flex;gap:6px;}
-.iw .icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:12px;pointer-events:none;z-index:1;}
+.fg{margin-bottom:16px;}
+label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;}
+.iw{position:relative;display:flex;gap:8px;}
+.iw .icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12px;pointer-events:none;z-index:1;opacity:0.6;}
 input[type=text],input[type=datetime-local],input[type=number]{
-  flex:1;background:var(--s2);border:1px solid var(--border);border-radius:10px;color:var(--text);
-  padding:10px 12px 10px 30px;font-size:14px;font-family:inherit;transition:border-color .2s,box-shadow .2s;min-width:0;
+  flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;color:var(--text);
+  padding:10px 12px 10px 12px;font-size:14px;font-family:inherit;transition:all 0.2s;min-width:0;
 }
-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,140,255,.15);}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 4px rgba(37,99,235,0.08);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 
 /* GPS button */
 .gps-btn{
-  flex-shrink:0;width:38px;height:38px;border-radius:10px;border:1px solid var(--border);
+  flex-shrink:0;width:40px;height:40px;border-radius:8px;border:1px solid var(--border);
   background:var(--s2);color:var(--muted);cursor:pointer;font-size:16px;
   display:flex;align-items:center;justify-content:center;transition:all .2s;
-  margin-top:0;
 }
 .gps-btn:hover{background:var(--border);color:var(--text);}
 .gps-btn.loading{animation:pulse 1s infinite;}
@@ -64,105 +73,105 @@ input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79
 
 /* Map mode selector */
 .map-mode-bar{
-  display:flex;gap:4px;margin-bottom:12px;
-  background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:4px;
+  display:flex;gap:4px;margin-bottom:14px;
+  background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:4px;
 }
 .mode-btn{
-  flex:1;padding:7px;border-radius:7px;border:none;
+  flex:1;padding:8px;border-radius:6px;border:none;
   font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);background:transparent;transition:all .2s;
 }
-.mode-btn.active{background:var(--accent);color:#fff;}
+.mode-btn.active{background:var(--s1);color:var(--accent);box-shadow:0 2px 4px rgba(0,0,0,0.05);}
+.mode-btn.active.travel{background:var(--accent);color:#fff;}
 
 /* Action buttons */
-.btn-group{display:flex;gap:8px;margin-top:14px;}
-.btn{flex:1;padding:12px;border-radius:10px;border:none;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
-.btn-primary{background:linear-gradient(135deg,var(--accent),var(--a2));color:#fff;box-shadow:0 4px 16px rgba(79,140,255,.35);}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(79,140,255,.5);}
+.btn-group{display:flex;gap:10px;margin-top:20px;}
+.btn{flex:1;padding:12px;border-radius:8px;border:none;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,0.2);}
+.btn-primary:hover{background:var(--a2);transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,0.3);}
 .btn-primary:disabled{opacity:.5;transform:none!important;}
-.btn-ghost{background:var(--s2);color:var(--muted);border:1px solid var(--border);}
-.btn-ghost:hover{color:var(--text);background:var(--border);}
+.btn-ghost{background:#fff;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--muted);background:var(--s2);}
 
 /* Result */
-#result-section{display:none;border-top:1px solid var(--border);}
-.prob-banner{margin:18px 18px 0;border-radius:var(--r);padding:18px;display:flex;align-items:center;gap:16px;border:1px solid;transition:all .4s;}
+#result-section{display:none;border-top:1px solid var(--border);background:var(--s2);}
+.prob-banner{margin:20px 20px 0;border-radius:var(--r);padding:20px;display:flex;align-items:center;gap:20px;border:1px solid var(--border);background:#fff;box-shadow:0 4px 6px rgba(0,0,0,0.02);transition:all .4s;}
 .prob-ring{position:relative;width:80px;height:80px;flex-shrink:0;}
 .prob-ring svg{transform:rotate(-90deg);}
 .prob-ring circle.track{fill:none;stroke:var(--s2);stroke-width:8;}
 .prob-ring circle.arc{fill:none;stroke-width:8;stroke-linecap:round;stroke-dasharray:188.5;stroke-dashoffset:188.5;transition:stroke-dashoffset .8s cubic-bezier(.34,1,.64,1),stroke .5s;}
 .prob-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .prob-pct{font-size:22px;font-weight:800;line-height:1;}
-.prob-lbl{font-size:9px;color:var(--muted);}
-.prob-info .prob-msg{font-size:14px;font-weight:600;line-height:1.5;}
-.prob-info .prob-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+.prob-lbl{font-size:9px;color:var(--muted);margin-top:2px;font-weight:600;}
+.prob-info .prob-msg{font-size:15px;font-weight:700;line-height:1.4;color:var(--text);}
+.prob-info .prob-sub{font-size:12px;color:var(--muted);margin-top:6px;font-weight:500;}
 
-.chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 18px 0;}
-.chip{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px;}
-.chip .clabel{font-size:11px;color:var(--muted);margin-bottom:5px;}
-.chip .cval{font-size:15px;font-weight:700;}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 20px 0;}
+.chip{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;box-shadow:0 2px 4px rgba(0,0,0,0.02);}
+.chip .clabel{font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600;}
+.chip .cval{font-size:16px;font-weight:700;color:var(--text);}
 
-.sim-list{padding:0 18px;display:flex;flex-direction:column;gap:6px;}
-.sim-row{display:flex;align-items:center;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;gap:12px;}
-.sim-row.best{border-color:var(--green);}
-.sim-offset{font-size:12px;color:var(--muted);flex-shrink:0;width:72px;}
-.sim-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
-.sim-bar{height:100%;border-radius:3px;transition:width .6s;}
+.sim-list{padding:0 20px;display:flex;flex-direction:column;gap:8px;}
+.sim-row{display:flex;align-items:center;background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 16px;gap:14px;}
+.sim-row.best{border-color:var(--green);background:rgba(16,185,129,0.02);}
+.sim-offset{font-size:12px;color:var(--muted);flex-shrink:0;width:72px;font-weight:600;}
+.sim-bar-wrap{flex:1;height:8px;background:var(--s2);border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+.sim-bar{height:100%;border-radius:4px;transition:width .6s;}
 .sim-pct{font-size:13px;font-weight:700;width:42px;text-align:right;flex-shrink:0;}
-.best-badge{font-size:10px;color:var(--green);background:rgba(34,208,114,.12);border:1px solid rgba(34,208,114,.25);border-radius:4px;padding:1px 6px;flex-shrink:0;}
+.best-badge{font-size:10px;color:var(--green);background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:4px;padding:2px 8px;flex-shrink:0;font-weight:700;}
 
 /* Map */
 #map-wrap{flex:1;position:relative;}
 #map{width:100%;height:100%;}
-.leaflet-tile{filter:brightness(.75) saturate(.9);}
-.leaflet-container{background:#0d1117;}
+.leaflet-container{background:#f0f2f5;}
 
 /* Map overlays */
-.map-card{position:absolute;z-index:1000;background:rgba(13,17,23,.92);border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(16px);}
-#map-summary{top:16px;left:16px;padding:14px 18px;display:none;min-width:210px;}
-#map-summary .ms-title{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;}
-#map-summary .ms-row{display:flex;justify-content:space-between;gap:20px;font-size:13px;margin-bottom:5px;}
-#map-summary .ms-row span:last-child{font-weight:700;}
+.map-card{position:absolute;z-index:1000;background:rgba(255,255,255,0.95);border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(8px);box-shadow:0 4px 12px rgba(0,0,0,0.08);}
+#map-summary{top:16px;left:16px;padding:14px 18px;display:none;min-width:220px;}
+#map-summary .ms-title{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px;}
+#map-summary .ms-row{display:flex;justify-content:space-between;gap:20px;font-size:13px;margin-bottom:7px;}
+#map-summary .ms-row span:last-child{font-weight:700;color:var(--text);}
 
-#map-hint{bottom:16px;left:50%;transform:translateX(-50%);padding:8px 16px;font-size:12px;color:var(--muted);white-space:nowrap;display:none;}
+#map-hint{bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;display:none;border-radius:30px;}
 
 /* Current location pulse */
 .pulse-marker{
   width:18px;height:18px;border-radius:50%;
-  background:rgba(79,140,255,.8);
+  background:rgba(37,99,235,0.8);
   border:3px solid #fff;
-  box-shadow:0 0 0 0 rgba(79,140,255,.6);
+  box-shadow:0 0 0 0 rgba(37,99,235,0.4);
   animation:ripple 1.6s infinite;
 }
 @keyframes ripple{
-  0%{box-shadow:0 0 0 0 rgba(79,140,255,.6);}
-  70%{box-shadow:0 0 0 14px rgba(79,140,255,0);}
-  100%{box-shadow:0 0 0 0 rgba(79,140,255,0);}
+  0%{box-shadow:0 0 0 0 rgba(37,99,235,0.4);}
+  70%{box-shadow:0 0 0 16px rgba(37,99,235,0);}
+  100%{box-shadow:0 0 0 0 rgba(37,99,235,0);}
 }
 
 /* Toast */
-#toast{position:fixed;bottom:24px;right:24px;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:13px 18px;font-size:13px;z-index:9999;transform:translateY(60px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;border-radius:12px;padding:14px 24px;font-size:14px;font-weight:600;z-index:9999;transform:translateY(60px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 24px rgba(0,0,0,0.15);}
 #toast.show{transform:translateY(0);opacity:1;}
 
 /* Spinner */
-.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;}
+.spin{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;}
 @keyframes sp{to{transform:rotate(360deg)}}
 
 @media(max-width:720px){
   .body-wrap{flex-direction:column;}
-  aside{width:100%;min-width:unset;max-height:58vh;border-right:none;border-bottom:1px solid var(--border);}
-  #map-wrap{flex:1;min-height:280px;}
+  aside{width:100%;min-width:unset;max-height:50vh;border-right:none;border-bottom:1px solid var(--border);}
+  #map-wrap{flex:1;min-height:300px;}
 }
 .realtime-badge {
-  background: #FFF9C4;
-  color: #F57F17;
-  padding: 8px 12px;
+  background: #fffbeb;
+  color: #92400e;
+  padding: 10px 14px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 700;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  border: 1px solid #FFE082;
+  gap: 10px;
+  border: 1px solid #fef3c7;
   width: 100%;
   box-sizing: border-box;
 }
@@ -171,11 +180,11 @@ input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79
 <body>
 
 <header>
-  <div class="logo-icon">⏰</div>
-  <span class="logo-title">지각 방지 스케줄러</span>
+  <div class="logo-icon">ST</div>
+  <span class="logo-title">LATE PREVENTION</span>
   <div class="header-right">
-    <span id="route-badge" class="hbadge badge-yellow" style="display:none">🗺 경로 계산 중...</span>
-    <span id="api-badge" class="hbadge badge-green">🌍 OSM + 카카오</span>
+    <span id="route-badge" class="hbadge badge-yellow" style="display:none">경로 계산 중...</span>
+    <span id="api-badge" class="hbadge badge-green">LIVE SERVICES</span>
     <span id="clock"></span>
   </div>
 </header>
@@ -185,81 +194,78 @@ input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79
   <!-- ── 사이드바 ── -->
   <aside>
     <div class="ss">
-      <div class="stitle">📍 이동 경로 설정</div>
+      <div class="stitle">ROUTE SETTINGS</div>
 
       <!-- 지도 클릭 모드 -->
       <div class="map-mode-bar">
-        <button class="mode-btn" id="mode-none" onclick="setMode('none')">🖱 일반</button>
-        <button class="mode-btn" id="mode-origin" onclick="setMode('origin')">🟢 출발지 찍기</button>
-        <button class="mode-btn" id="mode-dest" onclick="setMode('dest')">🔴 목적지 찍기</button>
+        <button class="mode-btn" id="mode-none" onclick="setMode('none')">Default</button>
+        <button class="mode-btn" id="mode-origin" onclick="setMode('origin')">Set Origin</button>
+        <button class="mode-btn" id="mode-dest" onclick="setMode('dest')">Set Destiny</button>
       </div>
 
       <!-- 이동 수단 모드 -->
-      <div class="map-mode-bar" style="margin-bottom: 20px;">
-        <button class="mode-btn active" id="tmode-car" onclick="setTravelMode('car')">🚗 자동차</button>
-        <button class="mode-btn" id="tmode-transit" onclick="setTravelMode('transit')">🚌 대중교통</button>
-        <button class="mode-btn" id="tmode-walk" onclick="setTravelMode('walk')">🚶 도보</button>
-        <button class="mode-btn" id="tmode-bike" onclick="setTravelMode('bike')">🚲 자전거</button>
+      <div class="map-mode-bar" style="margin-bottom: 24px;">
+        <button class="mode-btn travel active" id="tmode-car" onclick="setTravelMode('car')">Car</button>
+        <button class="mode-btn travel" id="tmode-transit" onclick="setTravelMode('transit')">Public</button>
+        <button class="mode-btn travel" id="tmode-walk" onclick="setTravelMode('walk')">Walk</button>
+        <button class="mode-btn travel" id="tmode-bike" onclick="setTravelMode('bike')">Bike</button>
       </div>
 
       <div class="fg">
-        <label>출발지</label>
+        <label>Origin</label>
         <div class="iw">
-          <span class="icon">🟢</span>
-          <input type="text" id="origin" placeholder="주소 입력 또는 지도에서 클릭"/>
-          <button class="gps-btn" id="gps-btn" onclick="useGPS()" title="현재 위치 사용">📍</button>
+          <input type="text" id="origin" placeholder="Search address or click on map"/>
+          <button class="gps-btn" id="gps-btn" onclick="useGPS()" title="Use Current Location">GPS</button>
         </div>
       </div>
 
       <div class="fg">
-        <label>목적지</label>
+        <label>Destiny</label>
         <div class="iw">
-          <span class="icon">🔴</span>
-          <input type="text" id="dest" placeholder="주소 입력 또는 지도에서 클릭"/>
+          <input type="text" id="dest" placeholder="Search address or click on map"/>
         </div>
       </div>
 
       <div class="fg">
-        <label>약속 시간</label>
+        <label>Appointment Time</label>
         <div class="iw">
-          <span class="icon">🕐</span>
           <input type="datetime-local" id="appt"/>
         </div>
       </div>
 
       <div class="row2">
         <div class="fg" style="margin:0">
-          <label>준비 시간 (분)</label>
-          <div class="iw"><span class="icon">🪥</span><input type="number" id="prep" value="20" min="0" max="120"/></div>
+          <label>Preparation (min)</label>
+          <div class="iw"><input type="number" id="prep" value="20" min="0" max="120"/></div>
         </div>
         <div class="fg" style="margin:0">
-          <label>지각 습관 (분)</label>
-          <div class="iw"><span class="icon">😅</span><input type="number" id="bias" value="5" min="0" max="60"/></div>
+          <label>Lateness Habit (min)</label>
+          <div class="iw"><input type="number" id="bias" value="5" min="0" max="60"/></div>
         </div>
       </div>
 
-      <div class="stitle" style="margin-top: 15px;">🔔 알림 설정</div>
+      <div class="stitle" style="margin-top: 24px;">NOTIFICATION SETTINGS</div>
       <div class="row2">
         <div class="fg" style="margin:0">
-          <label>1차 리마인드 (분 전)</label>
-          <div class="iw"><span class="icon">⏰</span><input type="number" id="alarm-offset-1" value="10" min="1" max="60"/></div>
+          <label>1st Reminder (min before)</label>
+          <div class="iw"><input type="number" id="alarm-offset-1" value="10" min="1" max="60"/></div>
         </div>
         <div class="fg" style="margin:0">
-          <label>2차 리마인드 (분 전)</label>
-          <div class="iw"><span class="icon">👞</span><input type="number" id="alarm-offset-2" value="5" min="1" max="60"/></div>
+          <label>2nd Reminder (min before)</label>
+          <div class="iw"><input type="number" id="alarm-offset-2" value="5" min="1" max="60"/></div>
         </div>
       </div>
 
-      <div class="btn-group" style="margin-top: 20px;">
-        <button class="btn btn-primary" id="btn-calc" onclick="calculate()">🔍 계산</button>
-        <button class="btn btn-ghost" onclick="fillDemo()">✨ 데모</button>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="btn-calc" onclick="calculate()">Calculate</button>
+        <button class="btn btn-ghost" onclick="fillDemo()">Demo</button>
       </div>
     </div>
 
     <!-- 결과 -->
     <div id="result-section">
-      <div class="ss" style="padding-top:16px">
-        <div class="stitle">📊 분석 결과</div>
+      <div class="ss" style="padding-top:20px">
+        <div class="stitle">ANALYSIS RESULTS</div>
         <div class="prob-banner" id="prob-banner">
           <div class="prob-ring">
             <svg viewBox="0 0 72 72" width="72" height="72">
@@ -268,7 +274,7 @@ input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79
             </svg>
             <div class="prob-center">
               <div class="prob-pct" id="prob-pct">0%</div>
-              <div class="prob-lbl">지각확률</div>
+              <div class="prob-lbl">PROB.</div>
             </div>
           </div>
           <div class="prob-info">
@@ -279,26 +285,26 @@ input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79
       </div>
 
       <div class="chips">
-        <div class="chip"><div class="clabel">🚀 추천 출발</div><div class="cval" id="c-dep" style="color:var(--accent)">—</div></div>
-        <div class="chip"><div class="clabel">🏁 예상 도착</div><div class="cval" id="c-arr">—</div></div>
-        <div class="chip"><div class="clabel">🚗 이동 시간</div><div class="cval" id="c-travel" style="color:var(--green)">—</div></div>
-        <div class="chip"><div class="clabel">⏳ 남은 시간</div><div class="cval" id="c-remain">—</div></div>
+        <div class="chip"><div class="clabel">Departure</div><div class="cval" id="c-dep">—</div></div>
+        <div class="chip"><div class="clabel">Arrival</div><div class="cval" id="c-arr">—</div></div>
+        <div class="chip"><div class="clabel">Travel Time</div><div class="cval" id="c-travel">—</div></div>
+        <div class="chip"><div class="clabel">Time Remaining</div><div class="cval" id="c-remain">—</div></div>
       </div>
 
       <!-- ODsay 환승 스텝 렌더링 컨테이너 -->
-      <div id="transit-steps-container" style="display: none; padding: 18px 18px 0;">
-        <div style="font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 8px;">🚌 대중교통 경로 안내 (ODsay)</div>
+      <div id="transit-steps-container" style="display: none; padding: 20px 20px 0;">
+        <div style="font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em;">Public Transit Routes</div>
         <div id="transit-steps-list" style="display:flex; flex-direction:column; gap:8px;"></div>
       </div>
 
-      <div style="padding: 16px 18px 0;">
-        <button id="btn-kakaomap" class="btn btn-secondary" style="width: 100%; background: #FEE500; color: #000; border: none; font-weight: bold;" onclick="openKakaoMap()">
-          <span style="font-size:16px">👉</span> 카카오맵으로 상세 노선 보기
+      <div style="padding: 16px 20px 0;">
+        <button id="btn-kakaomap" class="btn btn-secondary" style="width: 100%; background: #FEE500; color: #000; border: none; font-weight: bold; border-radius: 8px;" onclick="openKakaoMap()">
+          View Details on KakaoMap
         </button>
       </div>
 
-      <div class="ss" style="padding-top:16px">
-        <div class="stitle">🔁 출발 시점별 비교</div>
+      <div class="ss" style="padding-top:20px">
+        <div class="stitle">Departure Time Comparison</div>
         <div class="sim-list" id="sim-list"></div>
       </div>
     </div>
@@ -320,7 +326,7 @@ input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79
       <div class="ms-row"><span>거리</span><span id="ms-dist">—</span></div>
       <div class="ms-row"><span>도착 예정</span><span id="ms-arr">—</span></div>
     </div>
-    <div class="map-card" id="map-hint">🟢 클릭하여 출발지 선택</div>
+    <div class="map-card" id="map-hint">Click on map to select origin</div>
   </div>
 
 </div>
@@ -740,9 +746,9 @@ function showResult(d){
               <div style="width:24px; height:24px; border-radius:12px; background:${color}; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; z-index:2;">${icon}</div>
               <div style="width:2px; height:100%; background: ${s.type==='walk'? 'repeating-linear-gradient(to bottom, transparent, transparent 4px, #ccc 4px, #ccc 8px)' : color}; flex:1; margin-top: -2px; margin-bottom:-2px;"></div>
             </div>
-            <div style="flex:1; padding-bottom: 24px; padding-left: 8px;">
-              <div style="font-size:14px; font-weight: 500; color:var(--text); line-height:1.4;">${title}</div>
-              <div style="font-size:12px; color:var(--muted); margin-top:6px; line-height:1.4;">${detail}</div>
+            <div style="flex:1; padding-bottom: 24px; padding-left: 12px;">
+              <div style="font-size:14px; font-weight: 700; color:var(--text); line-height:1.4;">${title}</div>
+              <div style="font-size:12px; color:var(--muted); margin-top:6px; line-height:1.5;">${detail}</div>
             </div>
           </div>
         `;
