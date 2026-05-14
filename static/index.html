@@ -3,28 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>지각 방지 스케줄러 | Smart Route Scheduler</title>
-  <!-- Google Fonts: Inter for numbers/latin, Noto Sans KR for Korean -->
+  <title>지각 방지 스케줄러 | Premium Scheduler</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
     :root {
-      --primary: #1e3a29; /* Dark green from image */
+      --primary: #1e3a29;
       --primary-hover: #142a1d;
       --bg-gray: #f8f9f8;
       --sidebar-bg: #ffffff;
       --border-color: #ededed;
       --text-main: #222222;
       --text-muted: #888888;
-      --accent-yellow: #f5a623;
-      --accent-blue: #4a90e2;
       --white: #ffffff;
-      --radius: 8px;
+      --radius: 10px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,138 +33,98 @@
       overflow: hidden;
     }
 
-    /* --- Header --- */
     header {
-      height: 64px;
-      background: var(--white);
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      padding: 0 24px;
-      z-index: 1000;
+      height: 64px; background: var(--white); border-bottom: 1px solid var(--border-color);
+      display: flex; align-items: center; padding: 0 24px; z-index: 1000;
     }
     .header-left { display: flex; align-items: center; gap: 12px; min-width: 280px; }
-    .logo-container {
-      width: 36px; height: 36px;
-      background: var(--primary);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      color: white;
-    }
+    .logo-container { width: 36px; height: 36px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; }
     .logo-text { display: flex; flex-direction: column; }
     .logo-title { font-size: 16px; font-weight: 700; color: #333; line-height: 1.1; }
     .logo-subtitle { font-size: 10px; font-weight: 500; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
 
     .header-nav { display: flex; gap: 8px; margin-left: 40px; }
-    .nav-btn {
-      padding: 8px 16px; border-radius: 6px; border: none; background: transparent;
-      font-size: 14px; font-weight: 600; color: #666; cursor: pointer; transition: 0.2s;
-    }
+    .nav-btn { padding: 8px 16px; border-radius: 6px; border: none; background: transparent; font-size: 14px; font-weight: 600; color: #666; cursor: pointer; transition: 0.2s; }
     .nav-btn.active { background: #f0f4f1; color: var(--primary); }
-    .nav-btn:hover:not(.active) { background: #f9f9f9; }
 
     .header-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
     .status-badge { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #444; }
     .status-dot { width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; }
     .clock-container { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; background: #f5f5f5; padding: 4px 12px; border-radius: 4px; }
 
-    /* --- Layout --- */
     .app-body { flex: 1; display: flex; overflow: hidden; }
 
-    /* --- Sidebar --- */
     aside {
-      width: 340px; min-width: 340px;
-      background: var(--sidebar-bg);
-      border-right: 1px solid var(--border-color);
-      display: flex; flex-direction: column;
-      overflow-y: auto;
-      padding: 24px;
+      width: 380px; min-width: 380px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color);
+      display: flex; flex-direction: column; overflow-y: auto; padding: 24px;
     }
     aside::-webkit-scrollbar { width: 4px; }
     aside::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
 
-    h3 { font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; font-weight: 500; border-bottom: 1px solid #f0f0f0; padding-bottom: 4px; }
+    h3 { font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; font-weight: 500; border-bottom: 1px solid #f0f0f0; padding-bottom: 4px; margin-top: 20px; }
+    h3:first-child { margin-top: 0; }
 
-    .section { margin-bottom: 24px; }
-
-    /* Transit Modes Grid */
     .transit-modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
     .mode-item {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      height: 64px; border: 1px solid var(--border-color); border-radius: var(--radius);
-      background: #fff; cursor: pointer; transition: 0.2s; gap: 4px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60px;
+      border: 1px solid var(--border-color); border-radius: var(--radius); background: #fff; cursor: pointer; transition: 0.2s; gap: 4px;
     }
     .mode-item i { color: #888; font-size: 18px; }
     .mode-item span { font-size: 11px; color: #666; font-weight: 500; }
     .mode-item.active { background: var(--primary); border-color: var(--primary); }
     .mode-item.active i, .mode-item.active span { color: #fff; }
-    .mode-item:hover:not(.active) { background: #f9faf9; border-color: #ddd; }
 
-    /* Map Mode Bar */
     .map-modes { display: flex; border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; height: 36px; }
-    .map-m-btn { flex: 1; border: none; background: #fff; border-right: 1px solid var(--border-color); font-size: 12px; font-weight: 500; color: #777; cursor: pointer; transition: 0.2s; }
-    .map-m-btn:last-child { border-right: none; }
+    .map-m-btn { flex: 1; border: none; background: #fff; border-right: 1px solid var(--border-color); font-size: 12px; font-weight: 500; color: #777; cursor: pointer; }
     .map-m-btn.active { background: #f8f9f8; color: #333; font-weight: 700; }
+    .map-m-btn:last-child { border-right: none; }
 
-    /* Inputs */
-    .form-group { margin-bottom: 16px; }
-    .form-label { display: block; font-size: 12px; font-weight: 600; color: #555; margin-bottom: 6px; }
-    .input-wrapper { position: relative; display: flex; gap: 6px; }
-    .input-wrapper input {
-      flex: 1; height: 40px; padding: 0 12px; border: 1px solid var(--border-color); border-radius: var(--radius);
-      font-size: 13px; font-family: inherit; color: #333; background: #fcfcfc; transition: border-color 0.2s;
+    .form-group { margin-bottom: 12px; }
+    .form-label { display: block; font-size: 11px; font-weight: 600; color: #777; margin-bottom: 4px; text-transform: uppercase; }
+    .input-wrapper { display: flex; gap: 6px; }
+    input {
+      flex: 1; height: 38px; padding: 0 12px; border: 1px solid var(--border-color); border-radius: var(--radius);
+      font-size: 13px; font-family: inherit; color: #333; background: #fcfcfc;
     }
-    .input-wrapper input:focus { outline: none; border-color: var(--primary); background: #fff; }
-    .input-wrapper input::placeholder { color: #ccc; }
-    .gps-mini-btn { width: 40px; height: 40px; border: 1px solid var(--border-color); border-radius: var(--radius); background: #fff; color: #e74c3c; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-    .gps-mini-btn:hover { background: #fff5f5; border-color: #ffcccc; }
+    input:focus { outline: none; border-color: var(--primary); background: #fff; }
 
-    .grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .gps-mini { width: 38px; height: 38px; border: 1px solid var(--border-color); border-radius: var(--radius); background: #fff; color: #e74c3c; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-    /* Actions */
-    .action-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px; margin-top: 10px; }
-    .btn-main { height: 44px; border: none; border-radius: var(--radius); background: var(--primary); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-    .btn-main:hover { background: var(--primary-hover); transform: translateY(-1px); }
-    .btn-sub { height: 44px; border: 1px solid var(--border-color); border-radius: var(--radius); background: #f9faf9; color: #666; font-size: 14px; font-weight: 600; cursor: pointer; }
-    .btn-sub:hover { background: #f0f0f0; }
+    .btn-main { height: 44px; border: none; border-radius: var(--radius); background: var(--primary); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 10px; width: 100%; }
+    .btn-sub { height: 44px; border: 1px solid var(--border-color); border-radius: var(--radius); background: #f9faf9; color: #666; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 8px; }
 
-    /* Results */
-    .result-panel { margin-top: 24px; display: none; }
-    .prob-box {
-      background: #fff; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px;
-      display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    }
-    .prob-circle { width: 64px; height: 64px; position: relative; flex-shrink: 0; }
+    #result-panel { margin-top: 24px; display: none; }
+    .prob-box { background: #fff; border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; display: flex; align-items: center; gap: 14px; }
+    .prob-circle { width: 56px; height: 56px; position: relative; flex-shrink: 0; }
     .prob-circle svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-    .prob-circle circle { fill: none; stroke-width: 6; }
-    .prob-circle circle.bg { stroke: #f0f0f0; }
-    .prob-circle circle.progress { stroke: #2ecc71; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 75; transition: 0.5s; }
-    .prob-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 14px; }
-    .prob-info-txt { font-size: 14px; font-weight: 600; color: #333; line-height: 1.4; }
+    .prob-circle circle { fill: none; stroke-width: 5; }
+    .prob-circle .progress { stroke: #2ecc71; stroke-dasharray: 100; stroke-dashoffset: 100; transition: 0.8s ease-out; }
+    .prob-val { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
 
-    /* --- Map area --- */
-    #map-container { flex: 1; position: relative; background: #eee url('https://www.toptal.com/designers/subtlepatterns/uploads/grid_me_up.png'); }
+    .chip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .chip { background: #f8f9f8; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; }
+    .chip-label { font-size: 9px; color: #999; text-transform: uppercase; margin-bottom: 2px; font-weight: 600; }
+    .chip-val { font-size: 14px; font-weight: 700; color: #1e3a29; font-family: 'Inter', sans-serif; }
+
+    #transit-steps-list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .sim-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .sim-bar-bg { flex: 1; height: 4px; background: #eee; border-radius: 2px; position: relative; }
+    .sim-bar-fill { height: 100%; background: var(--primary); border-radius: 2px; transition: width 0.5s; }
+
+    #map-container { flex: 1; position: relative; background: #f0f0f0; }
     #map { width: 100%; height: 100%; }
 
-    /* Overlay Cards */
-    .map-overlay { position: absolute; z-index: 1000; background: rgba(255,255,255,0.95); border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); padding: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); backdrop-filter: blur(4px); }
-    #route-summary-card { top: 20px; left: 20px; min-width: 220px; display: none; }
-    .summary-title { font-size: 11px; text-transform: uppercase; color: #999; margin-bottom: 12px; font-weight: 600; }
-    .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
-    .summary-val { font-weight: 700; color: #222; }
-    .summary-status { color: #f39c12; font-weight: 700; }
+    #route-summary { position: absolute; top: 16px; left: 16px; min-width: 180px; z-index: 1000; background: rgba(255,255,255,0.9); padding: 14px; border-radius: 12px; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); backdrop-filter: blur(4px); }
+    #map-hint { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 1000; background: #fff; padding: 6px 16px; border-radius: 20px; font-size: 11px; color: #888; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
-    #map-tooltip { bottom: 20px; left: 50%; transform: translateX(-50%); background: white; border-radius: 30px; font-size: 12px; font-weight: 500; color: #666; padding: 6px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .pulse-marker { width: 16px; height: 16px; background: #2ecc71; border: 2.5px solid #fff; border-radius: 50%; animation: p 2s infinite; }
+    @keyframes p { 0%{box-shadow: 0 0 0 0 rgba(46,204,113,0.5)} 70%{box-shadow: 0 0 0 10px rgba(46,204,113,0)} 100%{box-shadow: 0 0 0 0 rgba(46,204,113,0)} }
 
-    /* Toast */
-    #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: white; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 500; z-index: 9999; transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
+    #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 13px; transition: 0.3s; z-index: 9999; }
     #toast.active { transform: translateX(-50%) translateY(0); }
-
-    /* Leaflet Overrides */
-    .leaflet-container { background: transparent !important; }
-    .pulse-marker { width: 16px; height: 16px; background: #2ecc71; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); animation: pulse 2s infinite; }
-    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
-
+    .spin { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: s .6s linear infinite; }
+    @keyframes s { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -179,7 +134,7 @@
       <div class="logo-container"><i data-lucide="clock"></i></div>
       <div class="logo-text">
         <span class="logo-title">지각 방지 스케줄러</span>
-        <span class="logo-subtitle">SMART ROUTE SCHEDULER</span>
+        <span class="logo-subtitle">PREMIUM SCHEDULER</span>
       </div>
     </div>
     <div class="header-nav">
@@ -188,254 +143,218 @@
       <button class="nav-btn">설정</button>
     </div>
     <div class="header-right">
-      <div class="status-badge">
-        <div class="status-dot"></div> 서비스 정상
-      </div>
-      <div class="clock-container" id="digital-clock">09:41</div>
+      <div class="status-badge"><div class="status-dot"></div> 서비스 정상</div>
+      <div class="clock-container" id="clock">--:--</div>
     </div>
   </header>
 
   <div class="app-body">
     <aside>
-      <div class="section">
-        <h3>이동 수단</h3>
-        <div class="transit-modes">
-          <div class="mode-item active" onclick="setTM('car', this)">
-            <i data-lucide="car"></i><span>자동차</span>
-          </div>
-          <div class="mode-item" onclick="setTM('transit', this)">
-            <i data-lucide="bus"></i><span>대중교통</span>
-          </div>
-          <div class="mode-item" onclick="setTM('walk', this)">
-            <i data-lucide="walking"></i><span>도보</span>
-          </div>
-          <div class="mode-item" onclick="setTM('bike', this)">
-            <i data-lucide="bike"></i><span>자전거</span>
-          </div>
-        </div>
+      <h3>이동 수단</h3>
+      <div class="transit-modes">
+        <div class="mode-item active" id="tm-car" onclick="setTM('car')"><i data-lucide="car"></i><span>자동차</span></div>
+        <div class="mode-item" id="tm-transit" onclick="setTM('transit')"><i data-lucide="bus"></i><span>대중교통</span></div>
+        <div class="mode-item" id="tm-walk" onclick="setTM('walk')"><i data-lucide="walking"></i><span>도보</span></div>
+        <div class="mode-item" id="tm-bike" onclick="setTM('bike')"><i data-lucide="info"></i><span>자전거</span></div>
       </div>
 
-      <div class="section">
-        <h3>지도 모드</h3>
-        <div class="map-modes">
-          <button class="map-m-btn active" id="m-none" onclick="setMM('none')">일반</button>
-          <button class="map-m-btn" id="m-origin" onclick="setMM('origin')">출발지 선택</button>
-          <button class="map-m-btn" id="m-dest" onclick="setMM('dest')">목적지 선택</button>
-        </div>
+      <h3>지도 모드</h3>
+      <div class="map-modes">
+        <button class="map-m-btn active" id="mm-none" onclick="setMM('none')">일반</button>
+        <button class="map-m-btn" id="mm-origin" onclick="setMM('origin')">출발지 선택</button>
+        <button class="map-m-btn" id="mm-dest" onclick="setMM('dest')">목적지 선택</button>
       </div>
 
-      <div class="section">
-        <h3>경로</h3>
-        <div class="form-group">
-          <span class="form-label">출발지</span>
-          <div class="input-wrapper">
-            <input type="text" id="origin" placeholder="위치를 검색하거나 지도 클릭">
-            <button class="gps-mini-btn" onclick="useGPS()"><i data-lucide="map-pin"></i></button>
-          </div>
-        </div>
-        <div class="form-group">
-          <span class="form-label">목적지</span>
-          <div class="input-wrapper">
-            <input type="text" id="dest" placeholder="도착지를 검색하거나 지도 클릭">
-          </div>
+      <h3>경로 설정</h3>
+      <div class="form-group">
+        <span class="form-label">출발지</span>
+        <div class="input-wrapper">
+          <input type="text" id="origin" placeholder="주소 입력 또는 지도 클릭">
+          <button class="gps-mini" onclick="useGPS()"><i data-lucide="map-pin"></i></button>
         </div>
       </div>
-
-      <div class="section">
-        <h3>시간 설정</h3>
-        <div class="grid-row">
-          <div class="form-group">
-            <span class="form-label">약속 시각</span>
-            <div class="input-wrapper"><input type="time" id="appt-time" value="09:00"></div>
-          </div>
-          <div class="form-group">
-            <span class="form-label">준비 시간</span>
-            <div class="input-wrapper"><input type="text" id="prep" value="30분"></div>
-          </div>
-        </div>
-        <div class="grid-row">
-          <div class="form-group">
-            <span class="form-label">지각 습관</span>
-            <div class="input-wrapper"><input type="text" id="bias" value="10분"></div>
-          </div>
-          <div class="form-group">
-            <span class="form-label">1차 알림</span>
-            <div class="input-wrapper"><input type="text" id="alarm" value="60분 전"></div>
-          </div>
-        </div>
+      <div class="form-group">
+        <span class="form-label">목적지</span>
+        <div class="input-wrapper"><input type="text" id="dest" placeholder="주소 입력 또는 지도 클릭"></div>
       </div>
 
-      <div class="action-row">
-        <button class="btn-main" onclick="calculate()">경로 계산</button>
-        <button class="btn-sub" onclick="fillDemo()">데모 보기</button>
+      <h3>상세 설정</h3>
+      <div class="form-group">
+        <span class="form-label">약속 시각</span>
+        <input type="datetime-local" id="appt">
+      </div>
+      <div class="grid-row">
+        <div class="form-group"><span class="form-label">준비 시간 (분)</span><input type="number" id="prep" value="20"></div>
+        <div class="form-group"><span class="form-label">지각 습관 (분)</span><input type="number" id="bias" value="5"></div>
+      </div>
+      <div class="grid-row">
+        <div class="form-group"><span class="form-label">1차 알림 (분 전)</span><input type="number" id="alarm1" value="10"></div>
+        <div class="form-group"><span class="form-label">2차 알림 (분 전)</span><input type="number" id="alarm2" value="5"></div>
       </div>
 
-      <div class="result-panel" id="result-panel">
-        <div class="section" style="margin-top: 30px;">
-          <h3>분석 결과</h3>
-          <div class="prob-box">
-            <div class="prob-circle">
-              <svg viewBox="0 0 36 36">
-                <circle class="bg" cx="18" cy="18" r="16"></circle>
-                <circle class="progress" id="prob-ring" cx="18" cy="18" r="16" stroke-dasharray="100" stroke-dashoffset="100"></circle>
-              </svg>
-              <div class="prob-text" id="prob-pct">25%</div>
-            </div>
-            <div class="prob-info-txt" id="prob-msg">안전하게<br>도착 가능합니다</div>
+      <button class="btn-main" id="calc-btn" onclick="calculate()">경로 계산 시작</button>
+      <button class="btn-sub" onclick="fillDemo()">데모 데이터 채우기</button>
+
+      <div id="result-panel">
+        <h3>분석 결과</h3>
+        <div class="prob-box">
+          <div class="prob-circle">
+            <svg viewBox="0 0 36 36"><circle class="progress" id="arc" cx="18" cy="18" r="15.9155"></circle></svg>
+            <div class="prob-val" id="prob-pct">0%</div>
           </div>
+          <div class="prob-info-txt" id="prob-msg">분석 중...</div>
         </div>
+
+        <div class="chip-grid">
+          <div class="chip"><div class="chip-label">추천 출발</div><div class="chip-val" id="c-dep">--:--</div></div>
+          <div class="chip"><div class="chip-label">예상 도착</div><div class="chip-val" id="c-arr">--:--</div></div>
+        </div>
+
+        <div id="transit-steps-container" style="display:none">
+          <h3>대중교통 경로</h3>
+          <div id="transit-steps-list"></div>
+        </div>
+
+        <div style="margin-top:20px" id="alarm-box"></div>
       </div>
     </aside>
 
     <main id="map-container">
       <div id="map"></div>
-
-      <div class="map-overlay" id="route-summary-card">
-        <div class="summary-title">경로 요약</div>
-        <div class="summary-row"><span>이동 시간</span><span class="summary-val" id="s-time">37분</span></div>
-        <div class="summary-row"><span>거리</span><span class="summary-val" id="s-dist">12.4 km</span></div>
-        <div class="summary-row"><span>도착 예정</span><span class="summary-val" id="s-arr">08:52</span></div>
-        <div class="summary-row"><span>교통 상황</span><span class="summary-status" id="s-status">보통</span></div>
+      <div id="route-summary">
+        <div class="summary-row"><span>이동 시간</span><span class="summary-val" id="s-time">--</span></div>
+        <div class="summary-row"><span>거리</span><span class="summary-val" id="s-dist">--</span></div>
+        <div class="summary-row"><span>상태</span><span class="summary-status" style="color:#2ecc71">정상</span></div>
       </div>
-
-      <div id="map-tooltip">지도에서 출발지·목적지를 직접 클릭하여 설정하세요</div>
+      <div id="map-hint">지도를 클릭하여 위치를 설정하세요.</div>
     </main>
   </div>
 
-  <div id="toast">알림 메시지</div>
+  <div id="toast"></div>
 
-  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // Initialize Lucide icons
     lucide.createIcons();
+    const map = L.map('map', {zoomControl: false}).setView([37.5665, 126.978], 12);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-    // Leaflet Setup
-    const map = L.map('map', { zoomControl: false }).setView([37.5665, 126.9780], 12);
-    // Custom monochromatic/clean tiles would be better, but OSM is standard.
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd',
-      maxZoom: 19
-    }).addTo(map);
+    let originMarker, destMarker, routeLine, activeTransitRoute;
+    let mode = 'none', travelMode = 'car', lastCalcData;
 
-    let originMarker, destMarker, routeLine;
-    let mode = 'none'; // none, origin, dest
-    let travelMode = 'car';
-
-    // Map Click Handler
     map.on('click', async (e) => {
       if (mode === 'none') return;
-      const { lat, lng } = e.latlng;
-      const addr = await reverseGeocode(lat, lng);
-
-      if (mode === 'origin') {
-        setOrigin(lat, lng, addr);
-        setMM('dest');
-      } else if (mode === 'dest') {
-        setDest(lat, lng, addr);
-        setMM('none');
-      }
+      const {lat, lng} = e.latlng;
+      const addr = await revGeo(lat, lng);
+      if (mode === 'origin') { setO(lat, lng, addr); setMM('dest'); }
+      else if (mode === 'dest') { setD(lat, lng, addr); setMM('none'); }
     });
 
     function setMM(m) {
-      mode = m;
-      document.querySelectorAll('.map-m-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('m-' + m).classList.add('active');
-      const tooltip = document.getElementById('map-tooltip');
-      if (m === 'origin') tooltip.innerText = "지도에서 출발지를 선택하세요";
-      else if (m === 'dest') tooltip.innerText = "지도에서 목적지를 선택하세요";
-      else tooltip.innerText = "지도에서 출발지·목적지를 직접 클릭하여 설정하세요";
+      mode = m; document.querySelectorAll('.map-m-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('mm-'+m).classList.add('active');
     }
 
-    function setTM(m, el) {
-      travelMode = m;
-      document.querySelectorAll('.mode-item').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
+    function setTM(m) {
+      travelMode = m; document.querySelectorAll('.mode-item').forEach(b => b.classList.remove('active'));
+      document.getElementById('tm-'+m).classList.add('active');
     }
 
-    function setOrigin(lat, lng, addr) {
-      document.getElementById('origin').value = addr || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    function setO(lat, lng, addr) {
+      document.getElementById('origin').value = addr || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
       if (originMarker) map.removeLayer(originMarker);
-      originMarker = L.marker([lat, lng], {
-        icon: L.divIcon({ className: '', html: '<div class="pulse-marker"></div>', iconSize: [16,16], iconAnchor: [8,8] })
-      }).addTo(map);
+      originMarker = L.marker([lat, lng], {icon: L.divIcon({className:'', html:'<div class="pulse-marker"></div>', iconSize:[16,16]})}).addTo(map);
     }
 
-    function setDest(lat, lng, addr) {
-      document.getElementById('dest').value = addr || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    function setD(lat, lng, addr) {
+      document.getElementById('dest').value = addr || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
       if (destMarker) map.removeLayer(destMarker);
-      destMarker = L.marker([lat, lng], {
-        icon: L.divIcon({ className: '', html: '<div style="width:16px;height:16px;background:#e74c3c;border:3px solid white;border-radius:50%;"></div>', iconSize:[16,16], iconAnchor:[8,8] })
-      }).addTo(map);
+      destMarker = L.marker([lat, lng], {icon: L.divIcon({className:'', html:'<div style="width:14px;height:14px;background:#e74c3c;border:2.5px solid #fff;border-radius:50%"></div>', iconSize:[14,14]})}).addTo(map);
     }
 
-    async function reverseGeocode(lat, lng) {
-      try {
-        const res = await fetch('/api/reverse_geocode', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lat, lng })
-        }).then(r => r.json());
-        return res.found ? res.address : null;
-      } catch { return null; }
-    }
-
-    function fillDemo() {
-      document.getElementById('origin').value = "강남역 3번 출구";
-      document.getElementById('dest').value = "서울시청";
-      setOrigin(37.4981, 127.0276, "강남역 3번 출구");
-      setDest(37.5665, 126.9780, "서울시청");
-      toast("데모 데이터를 입력했습니다.");
-    }
-
-    function toast(msg) {
-      const t = document.getElementById('toast');
-      t.innerText = msg;
-      t.classList.add('active');
-      setTimeout(() => t.classList.remove('active'), 3000);
+    async function revGeo(lat, lng) {
+      try { const r = await fetch('/api/reverse_geocode', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({lat, lng}) }).then(r=>r.json()); return r.found ? r.address : null; } catch { return null; }
     }
 
     async function calculate() {
-      const o = document.getElementById('origin').value;
-      const d = document.getElementById('dest').value;
-      if (!o || !d) { toast("출발지와 목적지를 선택해주세요."); return; }
+      const o = document.getElementById('origin').value, d = document.getElementById('dest').value, a = document.getElementById('appt').value;
+      if (!o || !d || !a) { toast("필드를 확인해주세요", "err"); return; }
+      const btn = document.getElementById('calc-btn'); btn.disabled = true; btn.innerHTML = '<div class="spin"></div>';
 
-      // Real calculation logic would call the backend
-      // Here we simulate the visualization for the UI demo based on the user's image
+      try {
+        const res = await fetch('/api/calculate', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ origin: o, destination: d, appointment_time: a.replace('T', ' ') + ':00', prep_time: parseInt(document.getElementById('prep').value), lateness_bias: parseInt(document.getElementById('bias').value), mode: travelMode })
+        }).then(r => r.json());
+        showRes(res);
+      } catch (err) { toast("계산 오류", "err"); }
+      finally { btn.disabled = false; btn.innerHTML = "경로 계산 시작"; }
+    }
+
+    function showRes(d) {
+      lastCalcData = d;
       document.getElementById('result-panel').style.display = 'block';
-      document.getElementById('route-summary-card').style.display = 'block';
+      const pct = Math.round(d.late_probability * 100);
+      document.getElementById('prob-pct').innerText = pct + "%";
+      document.getElementById('arc').style.strokeDashoffset = 100 - pct;
+      document.getElementById('prob-msg').innerText = d.message;
+      document.getElementById('c-dep').innerText = d.recommended_departure_time.split('T')[1].substring(0, 5);
+      document.getElementById('c-arr').innerText = d.expected_arrival_time.split('T')[1].substring(0, 5);
       
-      // Update probability circle (simulated)
-      const ring = document.getElementById('prob-ring');
-      const pctTxt = document.getElementById('prob-pct');
-      const val = 25; 
-      ring.style.strokeDashoffset = 100 - val;
-      pctTxt.innerText = val + "%";
+      document.getElementById('route-summary').style.display = 'block';
+      document.getElementById('s-time').innerText = d.travel_time + "분";
+      document.getElementById('s-dist').innerText = d.distance_km ? d.distance_km + "km" : "추정";
 
-      if (originMarker && destMarker) {
-        if (routeLine) map.removeLayer(routeLine);
-        routeLine = L.polyline([originMarker.getLatLng(), destMarker.getLatLng()], {
-          color: '#1e3a29', weight: 4, dashArray: '8, 8', opacity: 0.6
-        }).addTo(map);
-        map.fitBounds(routeLine.getBounds(), { padding: [100, 100] });
+      const tBox = document.getElementById('transit-steps-container');
+      const tList = document.getElementById('transit-steps-list');
+      if (d.mode === 'transit' && d.transit_steps) {
+        tBox.style.display = 'block';
+        let h = '';
+        d.transit_steps.forEach((opt, idx) => {
+          h += `<div onclick="drawT(${idx})" style="padding:12px; border:1px solid #eee; border-radius:8px; margin-bottom:8px; cursor:pointer; font-size:13px;">
+            <b>${opt.totalTime}분</b> - 옵션 ${idx+1} (${opt.type})
+            <div style="font-size:11px; color:#888; margin-top:4px">${opt.steps.map(s => s.type==='walk'?'도보':s.lane).join(' > ')}</div>
+          </div>`;
+        });
+        tList.innerHTML = h;
+        drawT(0);
+      } else {
+        tBox.style.display = 'none';
+        drawStatic(d);
       }
-      toast("경로 분석이 완료되었습니다.");
+    }
+
+    function drawT(idx) {
+      const opt = lastCalcData.transit_steps[idx];
+      if (!opt || !opt.polyline) return;
+      if (routeLine) map.removeLayer(routeLine);
+      if (activeTransitRoute) map.removeLayer(activeTransitRoute);
+      
+      const pts = opt.polyline.map(p => [p.lat, p.lng]);
+      activeTransitRoute = L.polyline(pts, {color: '#1e3a29', weight: 5, opacity: 0.8}).addTo(map);
+      map.fitBounds(activeTransitRoute.getBounds(), {padding: [50, 50]});
+    }
+
+    function drawStatic(d) {
+      if (routeLine) map.removeLayer(routeLine);
+      if (d.route_points) {
+        routeLine = L.polyline(d.route_points.map(p=>[p.lat,p.lng]), {color:'#1e3a29', weight:5}).addTo(map);
+        map.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
+      }
     }
 
     function useGPS() {
-      toast("현재 위치를 확인 중...");
-      navigator.geolocation.getCurrentPosition(pos => {
-        const { latitude: lat, longitude: lng } = pos.coords;
-        setOrigin(lat, lng, "현재 위치");
-        map.setView([lat, lng], 15);
-      }, () => toast("위치 권한을 확인해주세요."));
+      navigator.geolocation.getCurrentPosition(p => { const {latitude:la, longitude:ln} = p.coords; setO(la, ln, "현재 위치"); map.setView([la, ln], 14); });
     }
 
-    // Clock
-    setInterval(() => {
-      const now = new Date();
-      document.getElementById('digital-clock').innerText = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-    }, 1000);
+    function fillDemo() { setO(37.4981, 127.0276, "강남역"); setD(37.5665, 126.978, "서울시청"); }
 
+    function toast(m, t='ok') {
+      const e = document.getElementById('toast'); e.innerText = m; e.classList.add('active');
+      setTimeout(() => e.classList.remove('active'), 3000);
+    }
+
+    setInterval(() => { const n = new Date(); document.getElementById('clock').innerText = n.getHours().toString().padStart(2,'0')+":"+n.getMinutes().toString().padStart(2,'0'); }, 1000);
+    window.onload = () => { const n = new Date(); n.setHours(n.getHours()+1); document.getElementById('appt').value = n.toISOString().substring(0,16); };
   </script>
 </body>
 </html>
