@@ -401,10 +401,19 @@
       setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    function fillDemo() { setO(37.4981, 127.0276, "강남역 3번 출구"); setD(37.5665, 126.978, "서울시청"); }
+    function fillDemo() {
+      setO(37.4981, 127.0276, "강남역 3번 출구"); setD(37.5665, 126.978, "서울시청");
+      setMode('transit');
+      const t = new Date(Date.now() + 3600000);
+      document.getElementById('appt-h').value = String(t.getHours()).padStart(2,'0') + ':' + String(t.getMinutes()).padStart(2,'0');
+    }
     function useGPS() { navigator.geolocation.getCurrentPosition(p => { setO(p.coords.latitude, p.coords.longitude, "현재 위치"); map.setView([p.coords.latitude, p.coords.longitude], 14); }); }
     setInterval(() => { document.getElementById('clock').innerText = new Date().toTimeString().substring(0,5); }, 1000);
-    window.onload = () => { document.getElementById('clock').innerText = new Date().toTimeString().substring(0,5); };
+    window.onload = () => {
+      document.getElementById('clock').innerText = new Date().toTimeString().substring(0,5);
+      const t = new Date(Date.now() + 3600000);
+      document.getElementById('appt-h').value = String(t.getHours()).padStart(2,'0') + ':' + String(t.getMinutes()).padStart(2,'0');
+    };
   </script>
 </body>
 </html>
