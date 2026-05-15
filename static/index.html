@@ -256,6 +256,7 @@
 
     let originMarker, destMarker, activeLayer, routeLine;
     let mode = 'car', cmd = 'none', lastData;
+    let originCoords = null, destCoords = null;
 
     map.on('click', async (e) => {
       if (cmd === 'none') return;
@@ -286,12 +287,14 @@
     }
 
     function setO(lat, lng, addr) {
-      document.getElementById('origin').value = addr || '설정됨';
+      originCoords = {lat, lng};
+      document.getElementById('origin').value = addr || `${lat}, ${lng}`;
       if (originMarker) map.removeLayer(originMarker);
       originMarker = L.marker([lat, lng], {icon: L.divIcon({className:'', html:'<div class="custom-marker"></div>', iconSize:[24,24]})}).addTo(map);
     }
     function setD(lat, lng, addr) {
-      document.getElementById('dest').value = addr || '설정됨';
+      destCoords = {lat, lng};
+      document.getElementById('dest').value = addr || `${lat}, ${lng}`;
       if (destMarker) map.removeLayer(destMarker);
       destMarker = L.marker([lat, lng], {icon: L.divIcon({className:'', html:'<div class="custom-marker dest-marker"></div>', iconSize:[24,24]})}).addTo(map);
     }
@@ -301,8 +304,7 @@
     }
 
     async function calculate() {
-      const o = document.getElementById('origin').value, d = document.getElementById('dest').value;
-      if (!o || !d) { showToast("경로를 설정해주세요"); return; }
+      if (!originCoords || !destCoords) { showToast("출발지와 목적지를 설정해주세요"); return; }
       
       const btn = document.getElementById('calc-btn');
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 계산 중...';
@@ -313,10 +315,12 @@
       apptTime.setMinutes(parseInt(document.getElementById('appt-h').value.split(':')[1]));
       
       try {
+        const originStr = `${originCoords.lat}, ${originCoords.lng}`;
+        const destStr = `${destCoords.lat}, ${destCoords.lng}`;
         const res = await fetch('/api/calculate', {
           method: 'POST', headers: {'Content-Type':'application/json'},
           body: JSON.stringify({
-            origin: o, destination: d,
+            origin: originStr, destination: destStr,
             appointment_time: apptTime.toISOString().slice(0, 19).replace('T', ' '),
             prep_time: parseInt(document.getElementById('prep').value),
             lateness_bias: parseInt(document.getElementById('bias').value),
@@ -326,7 +330,7 @@
         
         lastData = res;
         display(res);
-      } catch (e) { showToast("오류가 발생했습니다"); }
+      } catch (e) { showToast("오류가 발생했습니다: " + e.message); }
       finally { btn.innerHTML = '경로 계산'; btn.disabled = false; }
     }
 
@@ -344,7 +348,7 @@
 
       const dBox = document.getElementById('transit-details');
       dBox.innerHTML = '';
-      if (d.mode === 'transit' && d.transit_steps) {
+      if (d.mode === 'transit' && d.transit_steps && d.transit_steps.length > 0) {
         d.transit_steps.forEach((opt, idx) => {
           const card = document.createElement('div');
           card.className = 'transit-card' + (idx === 0 ? ' active' : '');
