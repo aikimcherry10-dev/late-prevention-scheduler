@@ -352,8 +352,35 @@
         d.transit_steps.forEach((opt, idx) => {
           const card = document.createElement('div');
           card.className = 'transit-card' + (idx === 0 ? ' active' : '');
-          card.onclick = () => drawTransit(idx);
-          card.innerHTML = `<b>${opt.totalTime}분</b> - 옵션 ${idx+1}<br><span style="font-size:11px; color:#888;">${opt.type}</span>`;
+          card.onclick = () => {
+            document.querySelectorAll('.transit-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            drawTransit(idx);
+          };
+          let stepsHtml = '';
+          opt.steps.forEach(s => {
+            if (s.type === 'walk') {
+              stepsHtml += `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;color:#888;font-size:11px;">🚶 도보 ${s.time}분 (${s.dist}m)</div>`;
+            } else if (s.type === 'bus') {
+              stepsHtml += `<div style="display:flex;align-items:center;gap:6px;padding:5px 0;">
+                <span style="background:#3F51B5;color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">🚌 ${s.lane}</span>
+                <span style="font-size:11px;color:#444;">${s.start} → ${s.end}</span>
+              </div>
+              <div style="font-size:10px;color:#999;padding-left:12px;">${s.stationCount}정거장 · ${s.time}분</div>`;
+            } else if (s.type === 'subway') {
+              stepsHtml += `<div style="display:flex;align-items:center;gap:6px;padding:5px 0;">
+                <span style="background:#00BCD4;color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">🚇 ${s.lane}</span>
+                <span style="font-size:11px;color:#444;">${s.start} → ${s.end}</span>
+              </div>
+              <div style="font-size:10px;color:#999;padding-left:12px;">${s.stationCount}정거장 · ${s.time}분</div>`;
+            }
+          });
+          card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <b style="font-size:15px;">옵션 ${idx+1}</b>
+            <span style="font-size:14px;font-weight:700;color:var(--primary);">${opt.totalTime}분</span>
+          </div>
+          <div style="font-size:11px;color:#888;margin-bottom:6px;">${opt.type}${opt.realtime ? ' · ' + opt.realtime : ''}</div>
+          <div style="border-top:1px solid #f0f0f0;padding-top:8px;">${stepsHtml}</div>`;
           dBox.appendChild(card);
         });
         drawTransit(0);
