@@ -405,8 +405,10 @@
           let color = s.type==='bus'?'#3F51B5':(s.type==='subway'?getSubwayColor(s.lane):'#999');
           L.polyline(pts, {color:color, weight:6, opacity:0.9}).addTo(layer);
           if (s.type!=='walk') {
-            L.circleMarker(pts[0], {radius:4, color:color, fillOpacity:1}).addTo(layer);
-            L.circleMarker(pts[pts.length-1], {radius:4, color:color, fillOpacity:1}).addTo(layer);
+            const startDiv = L.divIcon({className: 'station-label', html: `<div style="background:#fff;border:2px solid ${color};padding:2px 6px;border-radius:12px;font-size:10px;font-weight:700;white-space:nowrap;color:#333;box-shadow:0 2px 4px rgba(0,0,0,0.1);">${s.start} 승차</div>`, iconSize: [null, null]});
+            const endDiv = L.divIcon({className: 'station-label', html: `<div style="background:#fff;border:2px solid ${color};padding:2px 6px;border-radius:12px;font-size:10px;font-weight:700;white-space:nowrap;color:#333;box-shadow:0 2px 4px rgba(0,0,0,0.1);">${s.end} 하차</div>`, iconSize: [null, null]});
+            L.marker(pts[0], {icon: startDiv}).addTo(layer);
+            L.marker(pts[pts.length-1], {icon: endDiv}).addTo(layer);
           }
         }
       });
