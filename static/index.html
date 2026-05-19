@@ -125,7 +125,7 @@
 
     #hint-label { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; background: #fff; padding: 6px 16px; border-radius: 20px; font-size: 12px; color: #888; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 
-    .custom-marker { width: 24px; height: 24px; background: var(--primary); border: 3px solid #fff; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+    .custom-marker { width: 36px; height: 36px; background: var(--primary); border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.2); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
     .dest-marker { background: #e74c3c; }
 
     #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: #fff; padding: 10px 24px; border-radius: 30px; font-size: 13px; z-index: 9999; transition: 0.3s; }
@@ -289,15 +289,17 @@
 
     function setO(lat, lng, addr) {
       originCoords = {lat, lng};
-      document.getElementById('origin').value = addr || `${lat}, ${lng}`;
+      let displayAddr = addr || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      if (displayAddr === "현재 위치") displayAddr = "현재 위치 (GPS)";
+      document.getElementById('origin').value = displayAddr;
       if (originMarker) map.removeLayer(originMarker);
-      originMarker = L.marker([lat, lng], {icon: L.divIcon({className:'', html:'<div class="custom-marker"></div>', iconSize:[24,24]})}).addTo(map);
+      originMarker = L.marker([lat, lng], {icon: L.divIcon({className:'', html:'<div class="custom-marker">출발</div>', iconSize:[36,36], iconAnchor:[18,18]})}).addTo(map);
     }
     function setD(lat, lng, addr) {
       destCoords = {lat, lng};
-      document.getElementById('dest').value = addr || `${lat}, ${lng}`;
+      document.getElementById('dest').value = addr || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
       if (destMarker) map.removeLayer(destMarker);
-      destMarker = L.marker([lat, lng], {icon: L.divIcon({className:'', html:'<div class="custom-marker dest-marker"></div>', iconSize:[24,24]})}).addTo(map);
+      destMarker = L.marker([lat, lng], {icon: L.divIcon({className:'', html:'<div class="custom-marker dest-marker">도착</div>', iconSize:[36,36], iconAnchor:[18,18]})}).addTo(map);
     }
 
     async function revGeo(lat, lng) {
@@ -457,7 +459,19 @@
       const t = new Date(Date.now() + 3600000);
       document.getElementById('appt-h').value = String(t.getHours()).padStart(2,'0') + ':' + String(t.getMinutes()).padStart(2,'0');
     }
-    function useGPS() { navigator.geolocation.getCurrentPosition(p => { setO(p.coords.latitude, p.coords.longitude, "현재 위치"); map.setView([p.coords.latitude, p.coords.longitude], 14); }); }
+    function useGPS() { 
+      if (!navigator.geolocation) { showToast("브라우저가 위치 정보를 지원하지 않습니다."); return; }
+      showToast("위치 정보를 가져오는 중...");
+      navigator.geolocation.getCurrentPosition(
+        p => { 
+          setO(p.coords.latitude, p.coords.longitude, "현재 위치"); 
+          map.setView([p.coords.latitude, p.coords.longitude], 15);
+          showToast("현재 위치가 출발지로 설정되었습니다.");
+        },
+        err => { showToast("위치 정보를 가져올 수 없습니다. 권한을 확인해주세요."); },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      );
+    }
     setInterval(() => { document.getElementById('clock').innerText = new Date().toTimeString().substring(0,5); }, 1000);
     window.onload = () => {
       document.getElementById('clock').innerText = new Date().toTimeString().substring(0,5);
