@@ -305,7 +305,7 @@ async def estimate_travel(origin: str, dest: str, mode: str):
 # ── 엔드포인트 ─────────────────────────────────────────────
 @app.get("/")
 async def root():
-    return FileResponse("static/index.html")
+    return FileResponse("static/index.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 @app.get("/api/config")
 async def config():
