@@ -204,15 +204,25 @@ async def get_odsay_transit(o_lat, o_lng, d_lat, d_lng):
                         dist = sub.get("distance", 0)
                         sid = sub.get("startID")
                         
-                        # 정류장 좌표 수집
+                        # 정류장 좌표 수집 (이 구간만의 polyline)
+                        step_poly = []
                         if sub.get("passStopList"):
                             for st in sub["passStopList"].get("stations", []):
                                 if st.get("x") and st.get("y"):
-                                    polyline.append({"lat": float(st["y"]), "lng": float(st["x"])})
+                                    pt = {"lat": float(st["y"]), "lng": float(st["x"])}
+                                    step_poly.append(pt)
+                                    polyline.append(pt) # 전체 polyline에도 추가 (fallback용)
+                                    
+                        # 도보일 경우 출발/도착 지점 직선으로 연결
+                        if ttype == 3 and not step_poly:
+                            if sub.get("startY") and sub.get("startX"):
+                                step_poly.append({"lat": sub["startY"], "lng": sub["startX"]})
+                            if sub.get("endY") and sub.get("endX"):
+                                step_poly.append({"lat": sub["endY"], "lng": sub["endX"]})
                         
                         if ttype == 3: # 걷기
                             if time > 0:
-                                steps.append({"type": "walk", "time": time, "dist": dist, "desc": "걷기"})
+                                steps.append({"type": "walk", "time": time, "dist": dist, "desc": "걷기", "polyline": step_poly})
                         elif ttype == 1: # 지하철
                             lane = sub["lane"][0].get("name", "지하철") if sub.get("lane") else "지하철"
                             steps.append({
@@ -221,7 +231,8 @@ async def get_odsay_transit(o_lat, o_lng, d_lat, d_lng):
                                 "stationCount": sub.get("stationCount", 0),
                                 "startLat": sub.get("startY"), "startLng": sub.get("startX"),
                                 "endLat": sub.get("endY"), "endLng": sub.get("endX"),
-                                "sid": sid
+                                "sid": sid,
+                                "polyline": step_poly
                             })
                         elif ttype == 2: # 버스
                             bus = sub["lane"][0].get("busNo", "버스") if sub.get("lane") else "버스"
@@ -231,7 +242,8 @@ async def get_odsay_transit(o_lat, o_lng, d_lat, d_lng):
                                 "stationCount": sub.get("stationCount", 0),
                                 "startLat": sub.get("startY"), "startLng": sub.get("startX"),
                                 "endLat": sub.get("endY"), "endLng": sub.get("endX"),
-                                "sid": sid
+                                "sid": sid,
+                                "polyline": step_poly
                             })
 
                     options.append({
