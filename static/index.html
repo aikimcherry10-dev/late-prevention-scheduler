@@ -277,7 +277,9 @@
       document.querySelectorAll('.mode-box').forEach(b => {
         b.classList.toggle('active', b.dataset.mode === m);
       });
-      if (originCoords && destCoords) calculate();
+      const originVal = document.getElementById('origin').value.trim();
+      const destVal = document.getElementById('dest').value.trim();
+      if (originVal && destVal) calculate();
     }
 
     function setCmd(c) {
@@ -307,7 +309,9 @@
     }
 
     async function calculate() {
-      if (!originCoords || !destCoords) { showToast("출발지와 목적지를 설정해주세요"); return; }
+      const originVal = document.getElementById('origin').value.trim();
+      const destVal = document.getElementById('dest').value.trim();
+      if (!originVal || !destVal) { showToast("출발지와 목적지를 입력하거나 지도에서 선택해주세요"); return; }
       
       const btn = document.getElementById('calc-btn');
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 계산 중...';
@@ -318,12 +322,10 @@
       apptTime.setMinutes(parseInt(document.getElementById('appt-h').value.split(':')[1]));
       
       try {
-        const originStr = `${originCoords.lat}, ${originCoords.lng}`;
-        const destStr = `${destCoords.lat}, ${destCoords.lng}`;
         const res = await fetch('/api/calculate', {
           method: 'POST', headers: {'Content-Type':'application/json'},
           body: JSON.stringify({
-            origin: originStr, destination: destStr,
+            origin: originVal, destination: destVal,
             appointment_time: apptTime.toISOString().slice(0, 19).replace('T', ' '),
             prep_time: parseInt(document.getElementById('prep').value),
             lateness_bias: parseInt(document.getElementById('bias').value),
@@ -338,6 +340,9 @@
     }
 
     function display(d) {
+      if (d.origin_coords) setO(d.origin_coords.lat, d.origin_coords.lng, document.getElementById('origin').value);
+      if (d.dest_coords) setD(d.dest_coords.lat, d.dest_coords.lng, document.getElementById('dest').value);
+
       document.getElementById('result-area').style.display = 'block';
       document.getElementById('summary-card').style.display = 'block';
       
@@ -454,10 +459,10 @@
     }
 
     function fillDemo() {
-      setO(37.4981, 127.0276, "강남역 3번 출구"); setD(37.5665, 126.978, "서울시청");
-      setMode('transit');
       const t = new Date(Date.now() + 3600000);
       document.getElementById('appt-h').value = String(t.getHours()).padStart(2,'0') + ':' + String(t.getMinutes()).padStart(2,'0');
+      setO(37.4981, 127.0276, "강남역 3번 출구"); setD(37.5665, 126.978, "서울시청");
+      setMode('transit');
     }
     function useGPS() { 
       if (!navigator.geolocation) { showToast("브라우저가 위치 정보를 지원하지 않습니다."); return; }
