@@ -277,6 +277,7 @@
       document.querySelectorAll('.mode-box').forEach(b => {
         b.classList.toggle('active', b.dataset.mode === m);
       });
+      if (originCoords && destCoords) calculate();
     }
 
     function setCmd(c) {
