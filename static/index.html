@@ -368,8 +368,9 @@
               </div>
               <div style="font-size:10px;color:#999;padding-left:12px;">${s.stationCount}정거장 · ${s.time}분</div>`;
             } else if (s.type === 'subway') {
+              let subColor = getSubwayColor(s.lane);
               stepsHtml += `<div style="display:flex;align-items:center;gap:6px;padding:5px 0;">
-                <span style="background:#00BCD4;color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">🚇 ${s.lane}</span>
+                <span style="background:${subColor};color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">🚇 ${s.lane}</span>
                 <span style="font-size:11px;color:#444;">${s.start} → ${s.end}</span>
               </div>
               <div style="font-size:10px;color:#999;padding-left:12px;">${s.stationCount}정거장 · ${s.time}분</div>`;
@@ -401,7 +402,7 @@
       opt.steps.forEach(s => {
         if (s.polyline) {
           const pts = s.polyline.map(p=>[p.lat,p.lng]);
-          let color = s.type==='bus'?'#3F51B5':(s.type==='subway'?'#00BCD4':'#999');
+          let color = s.type==='bus'?'#3F51B5':(s.type==='subway'?getSubwayColor(s.lane):'#999');
           L.polyline(pts, {color:color, weight:6, opacity:0.9}).addTo(layer);
           if (s.type!=='walk') {
             L.circleMarker(pts[0], {radius:4, color:color, fillOpacity:1}).addTo(layer);
@@ -421,6 +422,25 @@
         routeLine = L.polyline(d.route_points.map(p=>[p.lat,p.lng]), {color:'#1e3a29', weight:5, dashArray:'5,5'}).addTo(map);
         map.fitBounds(routeLine.getBounds(), {padding:[40,40]});
       }
+    }
+
+    function getSubwayColor(lane) {
+      if(lane.includes('1호선')) return '#0052A4';
+      if(lane.includes('2호선')) return '#00A84D';
+      if(lane.includes('3호선')) return '#EF7C1C';
+      if(lane.includes('4호선')) return '#00A5DE';
+      if(lane.includes('5호선')) return '#996CAC';
+      if(lane.includes('6호선')) return '#CD7C2F';
+      if(lane.includes('7호선')) return '#747F00';
+      if(lane.includes('8호선')) return '#E6186C';
+      if(lane.includes('9호선')) return '#BDB092';
+      if(lane.includes('수인분당')) return '#FABE00';
+      if(lane.includes('신분당')) return '#D4003B';
+      if(lane.includes('경의중앙')) return '#77C4A3';
+      if(lane.includes('경춘')) return '#0C8E72';
+      if(lane.includes('공항')) return '#0090D2';
+      if(lane.includes('신림')) return '#6789CA';
+      return '#00BCD4';
     }
 
     function showToast(m) {
