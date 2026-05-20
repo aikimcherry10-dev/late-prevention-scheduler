@@ -408,7 +408,7 @@
         L.polyline(opt.polyline.map(p=>[p.lat,p.lng]), {color:'#ccc', weight:4, dashArray:'5,10'}).addTo(layer);
       }
       opt.steps.forEach(s => {
-        if (s.polyline) {
+        if (s.polyline && s.polyline.length > 0) {
           const pts = s.polyline.map(p=>[p.lat,p.lng]);
           let color = s.type==='bus'?'#3F51B5':(s.type==='subway'?getSubwayColor(s.lane):'#999');
           L.polyline(pts, {color:color, weight:6, opacity:0.9}).addTo(layer);
