@@ -36,7 +36,10 @@ class SimRequest(BaseModel):
     offsets: list[int] = [0, 5, 10, 15, 20]
 
 # ── 유틸 ─────────────────────────────────────────────────
-def sigmoid(x): return 1 / (1 + math.exp(-x))
+def sigmoid(x): 
+    if x < -100: return 0.0
+    if x > 100: return 1.0
+    return 1 / (1 + math.exp(-x))
 def calc_late_prob(travel, prep, bias, remaining):
     return round(sigmoid((travel + prep + bias - remaining) / 10), 4)
 def rec_depart(appt, travel, prep, bias, safety=7):
