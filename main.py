@@ -15,6 +15,14 @@ load_dotenv()
 
 app = FastAPI(title="지각 방지 스케줄러")
 
+@app.on_event("startup")
+async def startup_event():
+    # 빌드 캐시 방지를 위한 정적 파일 체크 및 로그
+    import os
+    if os.path.exists("static/index.html"):
+        size = os.path.getsize("static/index.html")
+        print(f"--- STATIC FILE LOADED: static/index.html ({size} bytes) ---")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
