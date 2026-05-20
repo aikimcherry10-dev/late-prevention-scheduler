@@ -422,15 +422,21 @@
       });
       activeLayer = layer;
       layer.addTo(map);
-      map.fitBounds(layer.getBounds(), {padding:[40,40]});
+      if (layer.getLayers().length > 0) {
+        map.fitBounds(layer.getBounds(), {padding:[40,40]});
+      } else if (originCoords && destCoords) {
+        map.fitBounds(L.latLngBounds([originCoords.lat, originCoords.lng], [destCoords.lat, destCoords.lng]), {padding:[40,40]});
+      }
     }
 
     function drawStatic(d) {
       if (activeLayer) map.removeLayer(activeLayer);
       if (routeLine) map.removeLayer(routeLine);
-      if (d.route_points) {
+      if (d.route_points && d.route_points.length > 0) {
         routeLine = L.polyline(d.route_points.map(p=>[p.lat,p.lng]), {color:'#1e3a29', weight:5, dashArray:'5,5'}).addTo(map);
         map.fitBounds(routeLine.getBounds(), {padding:[40,40]});
+      } else if (originCoords && destCoords) {
+        map.fitBounds(L.latLngBounds([originCoords.lat, originCoords.lng], [destCoords.lat, destCoords.lng]), {padding:[40,40]});
       }
     }
 
