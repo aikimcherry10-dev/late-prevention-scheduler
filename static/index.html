@@ -405,7 +405,7 @@
       
       const layer = L.featureGroup();
       if (opt.polyline && opt.polyline.length > 0) {
-        L.polyline(opt.polyline.map(p=>[p.lat,p.lng]), {color:'#666', weight:4, dashArray:'10, 15', opacity:0.6}).addTo(layer);
+        L.polyline(opt.polyline.map(p=>[p.lat,p.lng]), {color:'#999', weight:3, dashArray:'5,10', opacity:0.5}).addTo(layer);
       }
       opt.steps.forEach(s => {
         let pts = [];
@@ -418,9 +418,9 @@
         if (pts.length > 0) {
           let color = s.type==='bus'?'#3F51B5':(s.type==='subway'?getSubwayColor(s.lane):'#666');
           if (s.type === 'walk') {
-              L.polyline(pts, {color:'#777', weight:5, dashArray:'8, 12', opacity:0.7}).addTo(layer);
+              L.polyline(pts, {color:'#999', weight:4, dashArray:'5,8', opacity:0.6}).addTo(layer);
           } else {
-              L.polyline(pts, {color:color, weight:7, opacity:0.9}).addTo(layer);
+              L.polyline(pts, {color:color, weight:6, opacity:0.9}).addTo(layer);
               L.circleMarker(pts[0], {radius:6, color:color, fillColor:'#fff', fillOpacity:1, weight:3}).addTo(layer)
                .bindTooltip(`<b style="color:${color};">${s.start}</b> 승차`, {permanent: true, direction: 'top', offset: [0, -5]}).openTooltip();
               L.circleMarker(pts[pts.length-1], {radius:6, color:color, fillColor:'#fff', fillOpacity:1, weight:3}).addTo(layer)
@@ -441,7 +441,7 @@
       if (activeLayer) map.removeLayer(activeLayer);
       if (routeLine) map.removeLayer(routeLine);
       if (d.route_points && d.route_points.length > 0) {
-        routeLine = L.polyline(d.route_points.map(p=>[p.lat,p.lng]), {color:'#1e3a29', weight:6, dashArray:'12, 18', opacity:0.9}).addTo(map);
+        routeLine = L.polyline(d.route_points.map(p=>[p.lat,p.lng]), {color:'#1e3a29', weight:5, dashArray:'8,12', opacity:0.8}).addTo(map);
         map.fitBounds(routeLine.getBounds(), {padding:[40,40]});
       } else if (originCoords && destCoords) {
         map.fitBounds(L.latLngBounds([originCoords.lat, originCoords.lng], [destCoords.lat, destCoords.lng]), {padding:[40,40]});
