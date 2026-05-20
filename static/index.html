@@ -322,7 +322,7 @@
       apptTime.setMinutes(parseInt(document.getElementById('appt-h').value.split(':')[1]));
       
       try {
-        const res = await fetch('/api/calculate', {
+        const response = await fetch('/api/calculate', {
           method: 'POST', headers: {'Content-Type':'application/json'},
           body: JSON.stringify({
             origin: originVal, destination: destVal,
@@ -331,11 +331,20 @@
             lateness_bias: parseInt(document.getElementById('bias').value),
             mode: mode
           })
-        }).then(r => r.json());
+        });
         
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.detail || "서버 응답 오류");
+        }
+        
+        const res = await response.json();
         lastData = res;
         display(res);
-      } catch (e) { showToast("오류가 발생했습니다: " + e.message); }
+      } catch (e) { 
+          console.error("Calc Error:", e);
+          showToast("계산 실패: " + e.message); 
+      }
       finally { btn.innerHTML = '경로 계산'; btn.disabled = false; }
     }
 
