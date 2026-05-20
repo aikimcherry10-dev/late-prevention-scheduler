@@ -61,19 +61,7 @@ def haversine(lat1, lon1, lat2, lon2):
 
 # ── 카카오 API ─────────────────────────────────────────────
 async def addr_to_coords(address: str) -> Optional[tuple[float, float]]:
-    # 데모용 주요 랜드마크 강제 하드코딩 (카카오 API 실패 대비)
-    poi = {
-        "도렴빌딩": (37.5721, 126.9740),
-        "홍대역": (37.5568, 126.9237),
-        "홍대입구역": (37.5568, 126.9237),
-        "홍대역 9번출구": (37.5568, 126.9237),
-        "홍대입구역 9번출구": (37.5568, 126.9237),
-        "서울 도렴빌딩": (37.5721, 126.9740)
-    }
-    for k, v in poi.items():
-        if k in address:
-            return v
-
+    print(f"Searching address: {address}")
     if "," in address:
         parts = address.split(",")
         try:
