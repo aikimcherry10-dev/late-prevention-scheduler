@@ -183,8 +183,9 @@ async def get_odsay_transit(o_lat, o_lng, d_lat, d_lng):
     enc_key = urllib.parse.quote(ODSAY_API_KEY)
     url = f"https://api.odsay.com/v1/api/searchPubTransPathT?SX={o_lng}&SY={o_lat}&EX={d_lng}&EY={d_lat}&apiKey={enc_key}"
     try:
-        headers = {'Referer': 'http://localhost/'}
-        async with httpx.AsyncClient() as c:
+        # 배포 환경에 맞는 Referer 설정
+        headers = {'Referer': 'https://late-scheduler-final.onrender.com'}
+        async with httpx.AsyncClient(timeout=10.0) as c:
             res = await c.get(url, headers=headers)
             data = res.json()
             if "result" in data and data["result"].get("path"):
