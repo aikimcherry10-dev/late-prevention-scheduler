@@ -69,12 +69,17 @@ async def addr_to_coords(address: str) -> Optional[tuple[float, float]]:
         except: pass
         
     # 1. 카카오 Local API 시도
+    print(f"Using Kakao Key: {KAKAO_REST_KEY[:5]}...")
     if KAKAO_REST_KEY:
         url = "https://dapi.kakao.com/v2/local/search/address.json"
-        headers = {"Authorization": f"KakaoAK {KAKAO_REST_KEY}"}
+        headers = {
+            "Authorization": f"KakaoAK {KAKAO_REST_KEY}",
+            "Referer": "https://late-scheduler-final.onrender.com"
+        }
         try:
-            async with httpx.AsyncClient() as c:
+            async with httpx.AsyncClient(timeout=5.0) as c:
                 res = await c.get(url, headers=headers, params={"query": address})
+                print(f"Kakao Addr Status: {res.status_code}")
                 if res.status_code == 200:
                     docs = res.json().get("documents", [])
                     if docs:
@@ -83,11 +88,13 @@ async def addr_to_coords(address: str) -> Optional[tuple[float, float]]:
                 # 키워드 검색(장소명) 백업
                 url_kw = "https://dapi.kakao.com/v2/local/search/keyword.json"
                 res_kw = await c.get(url_kw, headers=headers, params={"query": address})
+                print(f"Kakao KW Status: {res_kw.status_code}")
                 if res_kw.status_code == 200:
                     docs_kw = res_kw.json().get("documents", [])
                     if docs_kw:
                         return float(docs_kw[0]["y"]), float(docs_kw[0]["x"])
-        except: pass
+        except Exception as e:
+            print(f"Kakao API Connection Error: {e}")
 
     # 2. 카카오 실패 시 Nominatim Fallback
     try:
