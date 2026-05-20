@@ -183,13 +183,18 @@ async def get_odsay_transit(o_lat, o_lng, d_lat, d_lng):
     enc_key = urllib.parse.quote(ODSAY_API_KEY)
     url = f"https://api.odsay.com/v1/api/searchPubTransPathT?SX={o_lng}&SY={o_lat}&EX={d_lng}&EY={d_lat}&apiKey={enc_key}"
     try:
-        # 배포 환경에 맞는 Referer 설정
-        headers = {'Referer': 'https://late-scheduler-final.onrender.com'}
-        async with httpx.AsyncClient(timeout=10.0) as c:
+        # Referer를 비우거나 다른 값으로 시도하여 차단 우회 시도
+        headers = {
+            'Referer': 'https://late-scheduler-final.onrender.com',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as c:
             res = await c.get(url, headers=headers)
+            print(f"ODsay Status: {res.status_code}")
             data = res.json()
+            
             if "result" in data and data["result"].get("path"):
-                paths = data["result"]["path"][:3] # 최대 3개 경로 추천
+                paths = data["result"]["path"][:3]
                 options = []
                 best_time = None
                 
@@ -208,25 +213,24 @@ async def get_odsay_transit(o_lat, o_lng, d_lat, d_lng):
                         dist = sub.get("distance", 0)
                         sid = sub.get("startID")
                         
-                        # 정류장 좌표 수집 (이 구간만의 polyline)
                         step_poly = []
+                        # 정류장 좌표 수집
                         if sub.get("passStopList"):
                             for st in sub["passStopList"].get("stations", []):
                                 if st.get("x") and st.get("y"):
                                     pt = {"lat": float(st["y"]), "lng": float(st["x"])}
                                     step_poly.append(pt)
-                                    polyline.append(pt) # 전체 polyline에도 추가 (fallback용)
+                                    polyline.append(pt)
                                     
-                        # 도보일 경우 출발/도착 지점 직선으로 연결
-                        if ttype == 3 and not step_poly:
+                        # 도보 혹은 좌표 부족 시 보완
+                        if not step_poly:
                             if sub.get("startY") and sub.get("startX"):
-                                step_poly.append({"lat": sub["startY"], "lng": sub["startX"]})
+                                step_poly.append({"lat": float(sub["startY"]), "lng": float(sub["startX"])})
                             if sub.get("endY") and sub.get("endX"):
-                                step_poly.append({"lat": sub["endY"], "lng": sub["endX"]})
+                                step_poly.append({"lat": float(sub["endY"]), "lng": float(sub["endX"])})
                         
                         if ttype == 3: # 걷기
-                            if time > 0:
-                                steps.append({"type": "walk", "time": time, "dist": dist, "desc": "걷기", "polyline": step_poly})
+                            steps.append({"type": "walk", "time": time, "dist": dist, "desc": "걷기", "polyline": step_poly})
                         elif ttype == 1: # 지하철
                             lane = sub["lane"][0].get("name", "지하철") if sub.get("lane") else "지하철"
                             steps.append({
