@@ -41,6 +41,10 @@ ODSAY_API_KEY  = os.getenv("ODSAY_API_KEY", "")
 class CalcRequest(BaseModel):
     origin: str
     destination: str
+    origin_lat: Optional[float] = None
+    origin_lng: Optional[float] = None
+    dest_lat: Optional[float] = None
+    dest_lng: Optional[float] = None
     appointment_time: str
     prep_time: int = 20
     lateness_bias: int = 5
@@ -303,13 +307,7 @@ async def get_odsay_transit(o_lat, o_lng, d_lat, d_lng):
         print("ODsay Error:", e)
     return None
 
-async def estimate_travel(origin: str, dest: str, mode: str):
-    o = await addr_to_coords(origin)
-    d = await addr_to_coords(dest)
-
-    if not o or not d:
-        return 30, False, o, d, [], 0, None
-
+async def estimate_travel(o: tuple, d: tuple, mode: str):
     st_dist = haversine(o[0], o[1], d[0], d[1])
     transit_info = None
 
@@ -419,7 +417,21 @@ async def calculate(req: CalcRequest):
     now  = datetime.now()
     remaining = (appt - now).total_seconds() / 60
 
-    travel, is_kakao, o, d, pts, dist, transit_info = await estimate_travel(req.origin, req.destination, req.mode)
+    if req.origin_lat is not None and req.origin_lng is not None:
+        o = (req.origin_lat, req.origin_lng)
+    else:
+        o = await addr_to_coords(req.origin)
+
+    if req.dest_lat is not None and req.dest_lng is not None:
+        d = (req.dest_lat, req.dest_lng)
+    else:
+        d = await addr_to_coords(req.destination)
+
+    if not o or not d:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="주소를 좌표로 변환할 수 없습니다. 지도 화면에서 위치를 직접 클릭하거나, '데모 보기' 버튼을 사용해주세요.")
+
+    travel, is_kakao, o_coords, d_coords, pts, dist, transit_info = await estimate_travel(o, d, req.mode)
     prob    = calc_late_prob(travel, req.prep_time, req.lateness_bias, remaining)
     rec_dep = rec_depart(appt, travel, req.prep_time, req.lateness_bias)
     arrival = now + timedelta(minutes=travel)
@@ -436,8 +448,8 @@ async def calculate(req: CalcRequest):
         "distance_km": dist,
         "message": late_msg(prob),
         "mode": req.mode,
-        "origin_coords":  {"lat": o[0], "lng": o[1]} if o else None,
-        "dest_coords":    {"lat": d[0], "lng": d[1]} if d else None,
+        "origin_coords":  {"lat": o_coords[0], "lng": o_coords[1]} if o_coords else None,
+        "dest_coords":    {"lat": d_coords[0], "lng": d_coords[1]} if d_coords else None,
         "route_points":   pts,
         "transit_steps":  transit_info
     }

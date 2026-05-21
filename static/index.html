@@ -326,6 +326,10 @@
           method: 'POST', headers: {'Content-Type':'application/json'},
           body: JSON.stringify({
             origin: originVal, destination: destVal,
+            origin_lat: originCoords ? originCoords.lat : null,
+            origin_lng: originCoords ? originCoords.lng : null,
+            dest_lat: destCoords ? destCoords.lat : null,
+            dest_lng: destCoords ? destCoords.lng : null,
             appointment_time: apptTime.toISOString().slice(0, 19).replace('T', ' '),
             prep_time: parseInt(document.getElementById('prep').value),
             lateness_bias: parseInt(document.getElementById('bias').value),
