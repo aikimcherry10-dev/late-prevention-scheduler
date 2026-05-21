@@ -178,16 +178,20 @@ async def get_bus_realtime(station_id: int, bus_no: str):
     if not ODSAY_API_KEY: return None
     try:
         url = f"https://api.odsay.com/v1/api/realtimeStation?stationID={station_id}&apiKey={urllib.parse.quote(ODSAY_API_KEY)}"
+        # ODsay API 키가 http://localhost/ 도메인으로 등록되어 있음 - 서버사이드 호출이므로 고정
         headers = {'Referer': 'http://localhost/'}
-        async with httpx.AsyncClient() as c:
+        async with httpx.AsyncClient(timeout=8.0) as c:
             res = await c.get(url, headers=headers)
             data = res.json()
+            if "error" in data:
+                print(f"ODsay realtime error: {data['error']}")
+                return None
             if "result" in data and "bus" in data["result"]:
                 for b in data["result"]["bus"]:
                     if b.get("busNo") == bus_no:
-                        # 첫 번째 도착 정보 반환
                         return b.get("arrmsg1", b.get("arrmsg2", "정보 없음"))
-    except: pass
+    except Exception as e:
+        print(f"Bus realtime error: {e}")
     return None
 
 async def get_odsay_transit(o_lat, o_lng, d_lat, d_lng):
@@ -196,15 +200,21 @@ async def get_odsay_transit(o_lat, o_lng, d_lat, d_lng):
     enc_key = urllib.parse.quote(ODSAY_API_KEY)
     url = f"https://api.odsay.com/v1/api/searchPubTransPathT?SX={o_lng}&SY={o_lat}&EX={d_lng}&EY={d_lat}&apiKey={enc_key}"
     try:
-        # Referer를 비우거나 다른 값으로 시도하여 차단 우회 시도
+        # ODsay API 키가 http://localhost/ 도메인으로 등록됨
+        # 백엔드 서버사이드 호출이므로 등록된 도메인 Referer 고정 사용
         headers = {
-            'Referer': 'https://late-scheduler-final.onrender.com',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'Referer': 'http://localhost/',
         }
         async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as c:
             res = await c.get(url, headers=headers)
             print(f"ODsay Status: {res.status_code}")
             data = res.json()
+            
+            # 인증 오류 감지
+            if "error" in data:
+                err = data['error'][0] if isinstance(data['error'], list) else data['error']
+                print(f"ODsay API Error: {err}")
+                return None
             
             if "result" in data and data["result"].get("path"):
                 paths = data["result"]["path"][:3]
