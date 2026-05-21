@@ -430,10 +430,28 @@
               L.polyline(pts, {color:'#777', weight: 5, dashArray: '8, 12', opacity: 0.7}).addTo(layer);
           } else {
               L.polyline(pts, {color:color, weight: 8, opacity: 0.9}).addTo(layer);
-              L.circleMarker(pts[0], {radius: 7, color:color, fillColor: '#fff', fillOpacity: 1, weight: 4}).addTo(layer)
-               .bindTooltip(`<b style="color:${color};">${s.start}</b> 승차`, {permanent: true, direction: 'top', offset: [0, -5]}).openTooltip();
-              L.circleMarker(pts[pts.length-1], {radius: 7, color:color, fillColor: '#fff', fillOpacity: 1, weight: 4}).addTo(layer)
-               .bindTooltip(`<b style="color:${color};">${s.end}</b> 하차`, {permanent: true, direction: 'bottom', offset: [0, 5]}).openTooltip();
+              
+              // 시작(승차) 마커
+              L.marker(pts[0], {
+                  icon: L.divIcon({
+                      className: 'custom-transit-marker',
+                      html: `<div style="background-color: #fff; border: 2px solid ${color}; border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 700; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.2); white-space: nowrap;"><span style="color:${color}">${s.start}</span> 승차</div>`,
+                      iconSize: [null, null], 
+                      iconAnchor: [30, 45]
+                  })
+              }).addTo(layer);
+              L.circleMarker(pts[0], {radius: 6, color:'#fff', fillColor: color, fillOpacity: 1, weight: 2, zIndexOffset: 100}).addTo(layer);
+              
+              // 종료(하차) 마커
+              L.marker(pts[pts.length-1], {
+                  icon: L.divIcon({
+                      className: 'custom-transit-marker',
+                      html: `<div style="background-color: #fff; border: 2px solid #ccc; border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 700; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.2); white-space: nowrap;"><span style="color:#e74c3c">${s.end}</span> 하차</div>`,
+                      iconSize: [null, null],
+                      iconAnchor: [30, 45]
+                  })
+              }).addTo(layer);
+              L.circleMarker(pts[pts.length-1], {radius: 6, color:'#fff', fillColor: '#e74c3c', fillOpacity: 1, weight: 2, zIndexOffset: 100}).addTo(layer);
           }
         }
       });
