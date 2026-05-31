@@ -450,31 +450,31 @@ async def osrm_route(req: OSRMRequest):
 
 @app.post("/api/calculate")
 async def calculate(req: CalcRequest):
-    # 날짜 형식 처리 (T나 공백 모두 허용하도록 9번째 줄 수정)
     try:
-        appt_str = req.appointment_time.replace(' ', 'T')
-        appt = datetime.fromisoformat(appt_str)
-    except:
-        appt = datetime.now() + timedelta(hours=1)
-        
-    now  = datetime.now()
-    remaining = (appt - now).total_seconds() / 60
+        now  = datetime.now()
+        # 날짜 형식 처리
+        try:
+            appt_str = req.appointment_time.replace(' ', 'T')
+            appt = datetime.fromisoformat(appt_str)
+        except:
+            appt = now + timedelta(hours=1)
+            
+        remaining = (appt - now).total_seconds() / 60
 
-    if req.origin_lat is not None and req.origin_lng is not None:
-        o = (req.origin_lat, req.origin_lng)
-    else:
-        o = await addr_to_coords(req.origin)
+        if req.origin_lat is not None and req.origin_lng is not None:
+            o = (req.origin_lat, req.origin_lng)
+        else:
+            o = await addr_to_coords(req.origin)
 
-    if req.dest_lat is not None and req.dest_lng is not None:
-        d = (req.dest_lat, req.dest_lng)
-    else:
-        d = await addr_to_coords(req.destination)
+        if req.dest_lat is not None and req.dest_lng is not None:
+            d = (req.dest_lat, req.dest_lng)
+        else:
+            d = await addr_to_coords(req.destination)
 
-    if not o or not d:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=400, detail="주소를 좌표로 변환할 수 없습니다. 지도 화면에서 위치를 직접 클릭하거나, '데모 보기' 버튼을 사용해주세요.")
+        if not o or not d:
+            from fastapi import HTTPException
+            raise HTTPException(status_code=400, detail="주소를 좌표로 변환할 수 없습니다. 지도 화면에서 위치를 직접 클릭하거나, 주소를 확인해주세요.")
 
-    try:
         travel, is_kakao, o_coords, d_coords, pts, dist, transit_info = await estimate_travel(
             o, d, req.mode, 
             detour_weight=req.detour_weight if req.detour_weight is not None else 1.0, 
@@ -507,7 +507,8 @@ async def calculate(req: CalcRequest):
         import traceback
         traceback.print_exc()
         from fastapi import HTTPException
-        raise HTTPException(status_code=500, detail=f"계산 중 오류가 발생했습니다: {str(e)}")
+        if isinstance(e, HTTPException): raise e
+        raise HTTPException(status_code=500, detail=f"서버 오류가 발생했습니다: {str(e)}")
 
 
 @app.post("/api/simulate")
