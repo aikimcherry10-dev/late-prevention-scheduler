@@ -451,12 +451,22 @@ async def osrm_route(req: OSRMRequest):
 @app.post("/api/calculate")
 async def calculate(req: CalcRequest):
     try:
-        now  = datetime.now()
+        from datetime import timezone, timedelta
+        KST = timezone(timedelta(hours=9))
+        now = datetime.now(KST)
+        
         # 날짜 형식 처리
         try:
             appt_str = req.appointment_time.replace(' ', 'T')
             appt = datetime.fromisoformat(appt_str)
-        except:
+            # 만약 타임존 정보가 없으면 KST로 간주
+            if appt.tzinfo is None:
+                appt = appt.replace(tzinfo=KST)
+            else:
+                # 타임존 정보가 있으면 KST로 변환
+                appt = appt.astimezone(KST)
+        except Exception as e:
+            print(f"Time parsing fallback: {e}")
             appt = now + timedelta(hours=1)
             
         remaining = (appt - now).total_seconds() / 60
@@ -513,8 +523,16 @@ async def calculate(req: CalcRequest):
 
 @app.post("/api/simulate")
 async def simulate(req: SimRequest):
-    appt = datetime.fromisoformat(req.appointment_time)
-    now  = datetime.now()
+    try:
+        from datetime import timezone, timedelta
+        KST = timezone(timedelta(hours=9))
+        now = datetime.now(KST)
+        
+        appt = datetime.fromisoformat(req.appointment_time.replace(' ', 'T'))
+        if appt.tzinfo is None:
+            appt = appt.replace(tzinfo=KST)
+        else:
+            appt = appt.astimezone(KST)
     results = []
     for offset in req.offsets:
         dep = now + timedelta(minutes=offset)
@@ -528,7 +546,11 @@ async def simulate(req: SimRequest):
             "late_percent": round(prob * 100, 1),
             "message": late_msg(prob),
         })
-    return {"simulations": results}
+        return {"simulations": results}
+    except Exception as e:
+        print(f"SIMULATION ERROR: {e}")
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/realtime")
 async def api_realtime(req: dict):
