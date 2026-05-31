@@ -451,25 +451,22 @@ async def osrm_route(req: OSRMRequest):
 @app.post("/api/calculate")
 async def calculate(req: CalcRequest):
     try:
-        from datetime import timezone, timedelta
-        KST = timezone(timedelta(hours=9))
-        now = datetime.now(KST)
+        now = datetime.now()
         
-        # 날짜 형식 처리
+        # 날짜 형식 처리 (더 튼튼하게)
+        appt = now + timedelta(hours=1) # 기본값
         try:
-            appt_str = req.appointment_time.replace(' ', 'T')
-            appt = datetime.fromisoformat(appt_str)
-            # 만약 타임존 정보가 없으면 KST로 간주
-            if appt.tzinfo is None:
-                appt = appt.replace(tzinfo=KST)
+            val = req.appointment_time.strip()
+            if len(val) <= 5: # "17:55" 형태
+                h, m = map(int, val.split(':'))
+                appt = now.replace(hour=h, minute=m, second=0, microsecond=0)
             else:
-                # 타임존 정보가 있으면 KST로 변환
-                appt = appt.astimezone(KST)
+                appt = datetime.fromisoformat(val.replace(' ', 'T'))
         except Exception as e:
-            print(f"Time parsing fallback: {e}")
-            appt = now + timedelta(hours=1)
-            
-        remaining = (appt - now).total_seconds() / 60
+            print(f"Time parsing error: {e}")
+
+        # 타임존 전쟁 종결: 둘 다 Naive로 강제 통일해서 뺍니다.
+        remaining = (appt.replace(tzinfo=None) - now.replace(tzinfo=None)).total_seconds() / 60
 
         if req.origin_lat is not None and req.origin_lng is not None:
             o = (req.origin_lat, req.origin_lng)
@@ -524,19 +521,21 @@ async def calculate(req: CalcRequest):
 @app.post("/api/simulate")
 async def simulate(req: SimRequest):
     try:
-        from datetime import timezone, timedelta
-        KST = timezone(timedelta(hours=9))
-        now = datetime.now(KST)
-        
-        appt = datetime.fromisoformat(req.appointment_time.replace(' ', 'T'))
-        if appt.tzinfo is None:
-            appt = appt.replace(tzinfo=KST)
+        now = datetime.now()
+        val = req.appointment_time.strip()
+        if len(val) <= 5: # "17:55"
+            h, m = map(int, val.split(':'))
+            appt = now.replace(hour=h, minute=m, second=0, microsecond=0)
         else:
-            appt = appt.astimezone(KST)
-    results = []
-    for offset in req.offsets:
-        dep = now + timedelta(minutes=offset)
-        remaining = (appt - dep).total_seconds() / 60
+            appt = datetime.fromisoformat(val.replace(' ', 'T'))
+            
+        now = now.replace(tzinfo=None)
+        appt = appt.replace(tzinfo=None)
+        
+        results = []
+        for offset in req.offsets:
+            dep = now + timedelta(minutes=offset)
+            remaining = (appt - dep).total_seconds() / 60
         prob = calc_late_prob(req.travel_time, req.prep_time, req.lateness_bias, remaining)
         results.append({
             "offset_minutes": offset,
