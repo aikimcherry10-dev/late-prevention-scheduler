@@ -87,8 +87,7 @@
       font-size: 13px; font-family: inherit; background: #fafafa; color: #444; width: 100%;
     }
     input:focus { outline: none; border-color: var(--primary); background: #fff; }
-    .gps-btn { width: 38px; height: 38px; border: 1px solid var(--border); border-radius: 6px; background: #fff; color: #e74c3c; display: flex; align-items: center; justify-content: center; cursor: pointer; border-color: #3498db; color: #3498db; }
-    .gps-btn:hover { background: #f2f7fb; }
+    .gps-btn { width: 38px; height: 38px; border: 1px solid var(--border); border-radius: 6px; background: #fff; color: #e74c3c; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
@@ -126,32 +125,11 @@
 
     #hint-label { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; background: #fff; padding: 6px 16px; border-radius: 20px; font-size: 12px; color: #888; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 
-    .custom-marker { width: 36px; height: 36px; background: var(--primary); border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.2); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; z-index: 500 !important; }
+    .custom-marker { width: 36px; height: 36px; background: var(--primary); border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.2); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
     .dest-marker { background: #e74c3c; }
 
     #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: #fff; padding: 10px 24px; border-radius: 30px; font-size: 13px; z-index: 9999; transition: 0.3s; }
     #toast.show { transform: translateX(-50%) translateY(0); }
-
-    /* 실시간 위치 블루 닷 스타일 */
-    .user-location-dot {
-      width: 16px;
-      height: 16px;
-      background-color: #3498db;
-      border: 3px solid white;
-      border-radius: 50%;
-      box-shadow: 0 0 8px rgba(0,0,0,0.4), 0 0 15px rgba(52, 152, 219, 0.7);
-      z-index: 10000 !important;
-    }
-    
-    .floating-gps-btn {
-      position: absolute; bottom: 80px; right: 20px; z-index: 1000;
-      width: 44px; height: 44px; border-radius: 50%; background: #fff;
-      border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
-      color: #555; transition: 0.2s;
-    }
-    .floating-gps-btn:hover { background: #f9f9f9; }
-    .floating-gps-btn.active { background: #3498db; color: #fff; border-color: #3498db; }
   </style>
 </head>
 <body>
@@ -202,7 +180,7 @@
           <span class="form-label">출발지</span>
           <div class="input-grp">
             <input type="text" id="origin" placeholder="출발 위치 입력">
-            <button class="gps-btn" id="set-current-btn" onclick="setCurrentLocation()" title="현재 위치를 출발지로 설정"><i data-lucide="crosshair"></i></button>
+            <button class="gps-btn" onclick="useGPS()"><i data-lucide="map-pin"></i></button>
           </div>
         </div>
         <div class="form-item">
@@ -257,7 +235,6 @@
 
     <main>
       <div id="map"></div>
-      <button class="floating-gps-btn" id="map-gps-btn" onclick="toggleGPS()" title="내 위치 실시간 추적"><i data-lucide="navigation"></i></button>
       <div class="floating-summary" id="summary-card">
         <div class="f-title">경로 요약</div>
         <div class="f-row"><span class="f-label">이동 시간</span><span class="f-val" id="f-time">0분</span></div>
@@ -273,15 +250,13 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    let originMarker, destMarker, activeLayer, routeLine;
-    let mode = 'car', cmd = 'none', lastData;
-    let originCoords = null, destCoords = null;
-    let lastOriginAddr = "", lastDestAddr = "";
-    let userLocationMarker = null, watchId = null, isTracking = false;
-
     lucide.createIcons();
     const map = L.map('map', {zoomControl: false}).setView([37.5665, 126.978], 12);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+    let originMarker, destMarker, activeLayer, routeLine;
+    let mode = 'car', cmd = 'none', lastData;
+    let originCoords = null, destCoords = null;
 
     map.on('click', async (e) => {
       if (cmd === 'none') return;
@@ -317,26 +292,16 @@
     function setO(lat, lng, addr) {
       originCoords = {lat, lng};
       let displayAddr = addr || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-      lastOriginAddr = displayAddr;
       if (displayAddr === "현재 위치") displayAddr = "현재 위치 (GPS)";
       document.getElementById('origin').value = displayAddr;
       if (originMarker) map.removeLayer(originMarker);
-      originMarker = L.marker([lat, lng], {
-        icon: L.divIcon({className:'', html:'<div class="custom-marker">출발</div>', iconSize:[36,36], iconAnchor:[18,18]}),
-        zIndexOffset: 1000
-      }).addTo(map);
+      originMarker = L.marker([lat, lng], {icon: L.divIcon({className:'', html:'<div class="custom-marker">출발</div>', iconSize:[36,36], iconAnchor:[18,18]})}).addTo(map);
     }
-
     function setD(lat, lng, addr) {
       destCoords = {lat, lng};
-      let displayAddr = addr || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-      lastDestAddr = displayAddr;
-      document.getElementById('dest').value = displayAddr;
+      document.getElementById('dest').value = addr || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
       if (destMarker) map.removeLayer(destMarker);
-      destMarker = L.marker([lat, lng], {
-        icon: L.divIcon({className:'', html:'<div class="custom-marker dest-marker">도착</div>', iconSize:[36,36], iconAnchor:[18,18]}),
-        zIndexOffset: 1000
-      }).addTo(map);
+      destMarker = L.marker([lat, lng], {icon: L.divIcon({className:'', html:'<div class="custom-marker dest-marker">도착</div>', iconSize:[36,36], iconAnchor:[18,18]})}).addTo(map);
     }
 
     async function revGeo(lat, lng) {
@@ -344,15 +309,8 @@
     }
 
     async function calculate() {
-      const rawOrigin = document.getElementById('origin').value;
-      const rawDest = document.getElementById('dest').value;
-
-      if (rawOrigin !== lastOriginAddr) originCoords = null;
-      if (rawDest !== lastDestAddr) destCoords = null;
-
-      const originVal = rawOrigin.trim();
-      const destVal = rawDest.trim();
-
+      const originVal = document.getElementById('origin').value.trim();
+      const destVal = document.getElementById('dest').value.trim();
       if (!originVal || !destVal) { showToast("출발지와 목적지를 입력하거나 지도에서 선택해주세요"); return; }
       
       const btn = document.getElementById('calc-btn');
@@ -360,11 +318,8 @@
       btn.disabled = true;
 
       const apptTime = new Date();
-      if (document.getElementById('appt-h').value.includes(':')) {
-          const [h, m] = document.getElementById('appt-h').value.split(':');
-          apptTime.setHours(parseInt(h));
-          apptTime.setMinutes(parseInt(m));
-      }
+      apptTime.setHours(parseInt(document.getElementById('appt-h').value.split(':')[0]));
+      apptTime.setMinutes(parseInt(document.getElementById('appt-h').value.split(':')[1]));
       
       try {
         const response = await fetch('/api/calculate', {
@@ -376,8 +331,8 @@
             dest_lat: destCoords ? destCoords.lat : null,
             dest_lng: destCoords ? destCoords.lng : null,
             appointment_time: apptTime.toISOString().slice(0, 19).replace('T', ' '),
-            prep_time: parseInt(document.getElementById('prep').value) || 0,
-            lateness_bias: parseInt(document.getElementById('bias').value) || 0,
+            prep_time: parseInt(document.getElementById('prep').value),
+            lateness_bias: parseInt(document.getElementById('bias').value),
             mode: mode
           })
         });
@@ -457,7 +412,6 @@
     }
 
     function drawTransit(idx) {
-      if (!lastData || !lastData.transit_steps) return;
       const opt = lastData.transit_steps[idx];
       if (activeLayer) map.removeLayer(activeLayer);
       if (routeLine) map.removeLayer(routeLine);
@@ -480,6 +434,28 @@
               L.polyline(pts, {color:'#777', weight: 5, dashArray: '8, 12', opacity: 0.7}).addTo(layer);
           } else {
               L.polyline(pts, {color:color, weight: 8, opacity: 0.9}).addTo(layer);
+              
+              // 시작(승차) 마커
+              L.marker(pts[0], {
+                  icon: L.divIcon({
+                      className: 'custom-transit-marker',
+                      html: `<div style="background-color: #fff; border: 2px solid ${color}; border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 700; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.2); white-space: nowrap;"><span style="color:${color}">${s.start}</span> 승차</div>`,
+                      iconSize: [null, null], 
+                      iconAnchor: [30, 45]
+                  })
+              }).addTo(layer);
+              L.circleMarker(pts[0], {radius: 6, color:'#fff', fillColor: color, fillOpacity: 1, weight: 2, zIndexOffset: 100}).addTo(layer);
+              
+              // 종료(하차) 마커
+              L.marker(pts[pts.length-1], {
+                  icon: L.divIcon({
+                      className: 'custom-transit-marker',
+                      html: `<div style="background-color: #fff; border: 2px solid #ccc; border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 700; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.2); white-space: nowrap;"><span style="color:#e74c3c">${s.end}</span> 하차</div>`,
+                      iconSize: [null, null],
+                      iconAnchor: [30, 45]
+                  })
+              }).addTo(layer);
+              L.circleMarker(pts[pts.length-1], {radius: 6, color:'#fff', fillColor: '#e74c3c', fillOpacity: 1, weight: 2, zIndexOffset: 100}).addTo(layer);
           }
         }
       });
@@ -487,6 +463,8 @@
       layer.addTo(map);
       if (layer.getLayers().length > 0) {
         map.fitBounds(layer.getBounds(), {padding:[40,40]});
+      } else if (originCoords && destCoords) {
+        map.fitBounds(L.latLngBounds([originCoords.lat, originCoords.lng], [destCoords.lat, destCoords.lng]), {padding:[40,40]});
       }
     }
 
@@ -529,86 +507,21 @@
       const t = new Date(Date.now() + 3600000);
       document.getElementById('appt-h').value = String(t.getHours()).padStart(2,'0') + ':' + String(t.getMinutes()).padStart(2,'0');
       setO(37.4981, 127.0276, "강남역 3번 출구"); setD(37.5665, 126.978, "서울시청");
-      showToast("데모 데이터가 입력되었습니다.");
+      setMode('transit');
     }
-
-    function toggleGPS() {
+    function useGPS() { 
       if (!navigator.geolocation) { showToast("브라우저가 위치 정보를 지원하지 않습니다."); return; }
-      
-      const btn = document.getElementById('map-gps-btn');
-      
-      if (isTracking) {
-        navigator.geolocation.clearWatch(watchId);
-        if (userLocationMarker) map.removeLayer(userLocationMarker);
-        isTracking = false;
-        btn.classList.remove('active');
-        showToast("실시간 위치 추적을 종료합니다.");
-        return;
-      }
-
-      showToast("실시간 위치 추적을 시작합니다...");
-      isTracking = true;
-      btn.classList.add('active');
-
-      watchId = navigator.geolocation.watchPosition(
-        p => {
-          const lat = p.coords.latitude;
-          const lng = p.coords.longitude;
-          const pos = [lat, lng];
-
-          if (!userLocationMarker) {
-            userLocationMarker = L.marker(pos, {
-              icon: L.divIcon({ 
-                className: 'user-location-dot', 
-                html: '<div style="position:relative;"><div style="position:absolute;top:-25px;left:-20px;background:#3498db;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;z-index:10001;">내 위치</div></div>',
-                iconSize: [16, 16], 
-                iconAnchor: [8, 8] 
-              }),
-              zIndexOffset: 10000
-            }).addTo(map);
-          } else {
-            userLocationMarker.setLatLng(pos);
-          }
-          if (isTracking) map.panTo(pos);
-        },
-        err => {
-          showToast("위치 정보를 가져올 수 없습니다.");
-          isTracking = false;
-          btn.classList.remove('active');
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
-    }
-
-    async function setCurrentLocation() {
-      if (!navigator.geolocation) { showToast("브라우저가 위치 정보를 지원하지 않습니다."); return; }
-      const btn = document.getElementById('set-current-btn');
-      const originalIcon = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      
+      showToast("위치 정보를 가져오는 중...");
       navigator.geolocation.getCurrentPosition(
-        async p => {
-          const lat = p.coords.latitude;
-          const lng = p.coords.longitude;
-          const addr = await revGeo(lat, lng);
-          setO(lat, lng, addr || "현재 위치");
-          btn.innerHTML = originalIcon;
+        p => { 
+          setO(p.coords.latitude, p.coords.longitude, "현재 위치"); 
+          map.setView([p.coords.latitude, p.coords.longitude], 15);
           showToast("현재 위치가 출발지로 설정되었습니다.");
         },
-        err => {
-          showToast("위치 정보를 가져올 수 없습니다.");
-          btn.innerHTML = originalIcon;
-        },
-        { enableHighAccuracy: true, timeout: 5000 }
+        err => { showToast("위치 정보를 가져올 수 없습니다. 권한을 확인해주세요."); },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
       );
     }
-
-    const clearOrigin = () => { originCoords = null; lastOriginAddr = "MANUAL_EDIT"; };
-    const clearDest = () => { destCoords = null; lastDestAddr = "MANUAL_EDIT"; };
-
-    document.getElementById('origin').addEventListener('input', clearOrigin);
-    document.getElementById('dest').addEventListener('input', clearDest);
-
     setInterval(() => { document.getElementById('clock').innerText = new Date().toTimeString().substring(0,5); }, 1000);
     window.onload = () => {
       document.getElementById('clock').innerText = new Date().toTimeString().substring(0,5);
