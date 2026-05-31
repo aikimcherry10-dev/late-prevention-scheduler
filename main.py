@@ -474,28 +474,40 @@ async def calculate(req: CalcRequest):
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="주소를 좌표로 변환할 수 없습니다. 지도 화면에서 위치를 직접 클릭하거나, '데모 보기' 버튼을 사용해주세요.")
 
-    travel, is_kakao, o_coords, d_coords, pts, dist, transit_info = await estimate_travel(o, d, req.mode, req.detour_weight, req.transit_prefs)
-    prob    = calc_late_prob(travel, req.prep_time, req.lateness_bias, remaining)
-    rec_dep = rec_depart(appt, travel, req.prep_time, req.lateness_bias)
-    arrival = now + timedelta(minutes=travel)
+    try:
+        travel, is_kakao, o_coords, d_coords, pts, dist, transit_info = await estimate_travel(
+            o, d, req.mode, 
+            detour_weight=req.detour_weight if req.detour_weight is not None else 1.0, 
+            transit_prefs=req.transit_prefs
+        )
+        
+        prob    = calc_late_prob(travel, req.prep_time, req.lateness_bias, remaining)
+        rec_dep = rec_depart(appt, travel, req.prep_time, req.lateness_bias)
+        arrival = now + timedelta(minutes=travel)
 
-    return {
-        "late_probability": prob,
-        "late_percent": round(prob * 100, 1),
-        "recommended_departure_time": rec_dep.isoformat(timespec="seconds"),
-        "expected_arrival_time": arrival.isoformat(timespec="seconds"),
-        "travel_time": travel,
-        "prep_time": req.prep_time,
-        "remaining_minutes": round(remaining, 1),
-        "kakao_api_used": is_kakao,
-        "distance_km": dist,
-        "message": late_msg(prob),
-        "mode": req.mode,
-        "origin_coords":  {"lat": o_coords[0], "lng": o_coords[1]} if o_coords else None,
-        "dest_coords":    {"lat": d_coords[0], "lng": d_coords[1]} if d_coords else None,
-        "route_points":   pts,
-        "transit_steps":  transit_info
-    }
+        return {
+            "late_probability": prob,
+            "late_percent": round(prob * 100, 1),
+            "recommended_departure_time": rec_dep.isoformat(timespec="seconds"),
+            "expected_arrival_time": arrival.isoformat(timespec="seconds"),
+            "travel_time": travel,
+            "prep_time": req.prep_time,
+            "remaining_minutes": round(remaining, 1),
+            "kakao_api_used": is_kakao,
+            "distance_km": dist,
+            "message": late_msg(prob),
+            "mode": req.mode,
+            "origin_coords":  {"lat": o_coords[0], "lng": o_coords[1]} if o_coords else None,
+            "dest_coords":    {"lat": d_coords[0], "lng": d_coords[1]} if d_coords else None,
+            "route_points":   pts,
+            "transit_steps":  transit_info
+        }
+    except Exception as e:
+        print(f"CALCULATION ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=f"계산 중 오류가 발생했습니다: {str(e)}")
 
 
 @app.post("/api/simulate")
