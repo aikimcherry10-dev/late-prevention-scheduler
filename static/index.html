@@ -19,6 +19,20 @@
       --text: #333333;
       --text-muted: #999999;
       --white: #ffffff;
+      --card-bg: #ffffff;
+    }
+
+    /* 다크 모드 변수 */
+    body.dark-mode {
+      --primary: #2ecc71;
+      --active-bg: #1a2e21;
+      --border: #333333;
+      --bg-light: #121212;
+      --text: #e0e0e0;
+      --text-muted: #888888;
+      --white: #1e1e1e;
+      --card-bg: #252525;
+      background-color: #121212;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,6 +44,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      transition: background-color 0.3s, color 0.3s;
     }
 
     header {
@@ -44,14 +59,14 @@
 
     .header-nav { display: flex; gap: 4px; margin-left: 20px; }
     .nav-btn { padding: 6px 16px; border-radius: 6px; border: none; background: transparent; font-size: 13px; font-weight: 600; color: #777; cursor: pointer; }
-    .nav-btn.active { background: #f0f4f1; color: var(--primary); }
+    .nav-btn.active { background: var(--active-bg); color: var(--primary); }
 
     .header-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
     .status { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: #666; }
     .status-dot { width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; }
-    .clock { font-family: 'Roboto', sans-serif; font-weight: 700; font-size: 14px; color: #333; }
+    .clock { font-family: 'Roboto', sans-serif; font-weight: 700; font-size: 14px; color: var(--text); }
 
-    .app-body { flex: 1; display: flex; overflow: hidden; background: #fff; }
+    .app-body { flex: 1; display: flex; overflow: hidden; background: var(--white); }
 
     aside {
       width: 340px; min-width: 340px; background: var(--white); border-right: 1px solid var(--border);
@@ -61,70 +76,72 @@
     aside::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
 
     section { margin-bottom: 24px; }
-    .section-title { font-size: 11px; color: #ccc; font-weight: 700; border-top: 1px solid #f0f0f0; padding-top: 15px; margin-bottom: 12px; text-transform: uppercase; }
+    .section-title { font-size: 11px; color: var(--text-muted); font-weight: 700; border-top: 1px solid var(--border); padding-top: 15px; margin-bottom: 12px; text-transform: uppercase; }
     section:first-child .section-title { border-top: none; padding-top: 0; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     .transport-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .mode-box {
       display: flex; flex-direction: column; align-items: center; justify-content: center; height: 64px;
-      border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: 0.1s; gap: 4px; background: #fff;
+      border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: 0.1s; gap: 4px; background: var(--card-bg);
     }
-    .mode-box i { font-size: 18px; color: #888; }
-    .mode-box span { font-size: 11px; color: #666; font-weight: 500; }
+    .mode-box i { font-size: 18px; color: var(--text-muted); }
+    .mode-box span { font-size: 11px; color: var(--text); font-weight: 500; }
     .mode-box.active { background: var(--primary); border-color: var(--primary); }
     .mode-box.active i, .mode-box.active span { color: #fff; }
 
     .map-cmd-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
-    .cmd-btn { border: none; background: #fff; border-right: 1px solid var(--border); height: 32px; font-size: 11px; font-weight: 600; color: #777; cursor: pointer; }
-    .cmd-btn.active { background: #fdfbf7; color: #333; font-weight: 700; }
+    .cmd-btn { border: none; background: var(--card-bg); border-right: 1px solid var(--border); height: 32px; font-size: 11px; font-weight: 600; color: var(--text-muted); cursor: pointer; }
+    .cmd-btn.active { background: var(--bg-light); color: var(--text); font-weight: 700; }
     .cmd-btn:last-child { border-right: none; }
 
     .form-item { margin-bottom: 12px; }
-    .form-label { display: block; font-size: 11px; font-weight: 700; color: #888; margin-bottom: 4px; }
+    .form-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
     .input-grp { display: flex; gap: 6px; }
-    input {
+    input, select {
       flex: 1; height: 38px; border: 1px solid var(--border); border-radius: 6px; padding: 0 12px;
-      font-size: 13px; font-family: inherit; background: #fafafa; color: #444; width: 100%;
+      font-size: 13px; font-family: inherit; background: var(--bg-light); color: var(--text); width: 100%;
     }
-    input:focus { outline: none; border-color: var(--primary); background: #fff; }
-    .gps-btn { width: 38px; height: 38px; border: 1px solid var(--border); border-radius: 6px; background: #fff; color: #e74c3c; display: flex; align-items: center; justify-content: center; cursor: pointer; border-color: #3498db; color: #3498db; }
-    .gps-btn:hover { background: #f2f7fb; }
+    input:focus { outline: none; border-color: var(--primary); }
+    
+    .gps-btn { width: 38px; height: 38px; border: 1px solid var(--border); border-radius: 6px; background: var(--card-bg); color: #3498db; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
     .btn-calc { height: 52px; border: none; border-radius: 8px; background: var(--primary); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; width: 100%; }
     .btn-calc:hover { opacity: 0.95; }
-    .btn-demo { height: 52px; border: 1px solid var(--border); border-radius: 8px; background: #f9f9f9; color: #444; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 8px; }
+    .btn-demo { height: 52px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-light); color: var(--text); font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 8px; }
 
-    #result-area { border-top: 1px solid #f0f0f0; padding-top: 20px; margin-top: 10px; display: none; }
-    .prob-panel { background: #fdfbf7; border-radius: 12px; padding: 16px; border: 1px solid #eee; margin-top: 12px; }
+    #result-area { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 10px; display: none; }
+    .prob-panel { background: var(--bg-light); border-radius: 12px; padding: 16px; border: 1px solid var(--border); margin-top: 12px; }
     .prob-info { display: flex; align-items: center; gap: 12px; }
     .prob-ring { width: 50px; height: 50px; position: relative; }
     .prob-ring svg { transform: rotate(-90deg); width: 100%; height: 100%; }
     .prob-ring circle { fill: none; stroke-width: 5; }
-    .prob-ring .bg { stroke: #eee; }
+    .prob-ring .bg { stroke: var(--border); }
     .prob-ring .fg { stroke: #2ecc71; stroke-dasharray: 100; stroke-dashoffset: 100; transition: 0.5s; stroke-linecap: round; }
-    .prob-text { font-size: 13px; font-weight: 700; line-height: 1.4; color: #222; }
+    .prob-text { font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--text); }
 
-    #transit-details { margin-top: 20px; }
-    .transit-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; }
-    .transit-card.active { border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .transit-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; color: var(--text); }
+    .transit-card.active { border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 
-    main { flex: 1; position: relative; background: #f0f0f0; }
+    main { flex: 1; position: relative; background: #eee; }
     #map { width: 100%; height: 100%; }
 
     .floating-summary {
       position: absolute; top: 20px; left: 20px; z-index: 1000;
-      background: #fff; border-radius: 12px; padding: 20px; width: 220px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.1); border: 1px solid #eee; display: none;
+      background: var(--card-bg); border-radius: 12px; padding: 20px; width: 220px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2); border: 1px solid var(--border); display: none;
     }
-    .f-title { font-size: 11px; color: #aaa; margin-bottom: 12px; font-weight: 700; text-transform: uppercase; }
+    .f-title { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; text-transform: uppercase; }
     .f-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
-    .f-label { color: #666; font-weight: 500; }
-    .f-val { font-weight: 700; color: #111; font-family: 'Roboto', sans-serif; }
+    .f-label { color: var(--text-muted); font-weight: 500; }
+    .f-val { font-weight: 700; color: var(--text); font-family: 'Roboto', sans-serif; }
     .f-stat { color: #e67e22; font-weight: 700; }
 
-    #hint-label { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; background: #fff; padding: 6px 16px; border-radius: 20px; font-size: 12px; color: #888; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    #hint-label { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; background: var(--card-bg); padding: 6px 16px; border-radius: 20px; font-size: 12px; color: var(--text-muted); box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
 
     .custom-marker { width: 36px; height: 36px; background: var(--primary); border: 2px solid #fff; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.2); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; z-index: 500 !important; }
     .dest-marker { background: #e74c3c; }
@@ -132,26 +149,35 @@
     #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: #fff; padding: 10px 24px; border-radius: 30px; font-size: 13px; z-index: 9999; transition: 0.3s; }
     #toast.show { transform: translateX(-50%) translateY(0); }
 
-    /* 실시간 위치 블루 닷 스타일 */
     .user-location-dot {
-      width: 16px;
-      height: 16px;
-      background-color: #3498db;
-      border: 3px solid white;
-      border-radius: 50%;
-      box-shadow: 0 0 8px rgba(0,0,0,0.4), 0 0 15px rgba(52, 152, 219, 0.7);
-      z-index: 10000 !important;
+      width: 16px; height: 16px; background-color: #3498db; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 8px rgba(0,0,0,0.4), 0 0 15px rgba(52, 152, 219, 0.7); z-index: 10000 !important;
     }
     
     .floating-gps-btn {
       position: absolute; bottom: 80px; right: 20px; z-index: 1000;
-      width: 44px; height: 44px; border-radius: 50%; background: #fff;
-      border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      width: 44px; height: 44px; border-radius: 50%; background: var(--card-bg);
+      border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       display: flex; align-items: center; justify-content: center; cursor: pointer;
-      color: #555; transition: 0.2s;
+      color: var(--text); transition: 0.2s;
     }
-    .floating-gps-btn:hover { background: #f9f9f9; }
     .floating-gps-btn.active { background: #3498db; color: #fff; border-color: #3498db; }
+
+    /* 설정 페이지 전용 스타일 */
+    .setting-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .setting-label { font-size: 14px; font-weight: 500; color: var(--text); }
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--primary); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    input[type=range] { -webkit-appearance: none; width: 100%; height: 6px; background: #ddd; border-radius: 5px; outline: none; margin: 10px 0; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; background: var(--primary); cursor: pointer; border-radius: 50%; }
+
+    .check-grp { display: flex; flex-direction: column; gap: 8px; }
+    .check-item { display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; }
+    .check-item input { width: 18px; height: 18px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -165,9 +191,9 @@
       </div>
     </div>
     <div class="header-nav" id="nav-list">
-      <button class="nav-btn active">경로 계산</button>
-      <button class="nav-btn">히스토리</button>
-      <button class="nav-btn">설정</button>
+      <button class="nav-btn active" onclick="switchTab('calculate')">경로 계산</button>
+      <button class="nav-btn" onclick="switchTab('history')">히스토리</button>
+      <button class="nav-btn" onclick="switchTab('settings')">설정</button>
     </div>
     <div class="header-right">
       <div class="status"><div class="status-dot"></div> 서비스 정상</div>
@@ -177,81 +203,129 @@
 
   <div class="app-body">
     <aside>
-      <section>
-        <div class="section-title">이동 수단</div>
-        <div class="transport-grid">
-          <div class="mode-box active" data-mode="car" onclick="setMode('car')"><i data-lucide="car"></i><span>자동차</span></div>
-          <div class="mode-box" data-mode="transit" onclick="setMode('transit')"><i data-lucide="bus"></i><span>대중교통</span></div>
-          <div class="mode-box" data-mode="walk" onclick="setMode('walk')"><i data-lucide="user"></i><span>도보</span></div>
-          <div class="mode-box" data-mode="bike" onclick="setMode('bike')"><i data-lucide="bike"></i><span>자전거</span></div>
-        </div>
-      </section>
-
-      <section>
-        <div class="section-title">지도 모드</div>
-        <div class="map-cmd-grid">
-          <button class="cmd-btn active" id="cmd-none" onclick="setCmd('none')">일반</button>
-          <button class="cmd-btn" id="cmd-origin" onclick="setCmd('origin')">출발지 선택</button>
-          <button class="cmd-btn" id="cmd-dest" onclick="setCmd('dest')">목적지 선택</button>
-        </div>
-      </section>
-
-      <section>
-        <div class="section-title">경로</div>
-        <div class="form-item">
-          <span class="form-label">출발지</span>
-          <div class="input-grp">
-            <input type="text" id="origin" placeholder="출발 위치 입력">
-            <button class="gps-btn" id="set-current-btn" onclick="setCurrentLocation()" title="현재 위치를 출발지로 설정"><i data-lucide="crosshair"></i></button>
+      <!-- 경로 계산 탭 -->
+      <div id="tab-calculate" class="tab-content active">
+        <section>
+          <div class="section-title">이동 수단</div>
+          <div class="transport-grid">
+            <div class="mode-box active" data-mode="car" onclick="setMode('car')"><i data-lucide="car"></i><span>자동차</span></div>
+            <div class="mode-box" data-mode="transit" onclick="setMode('transit')"><i data-lucide="bus"></i><span>대중교통</span></div>
+            <div class="mode-box" data-mode="walk" onclick="setMode('walk')"><i data-lucide="user"></i><span>도보</span></div>
+            <div class="mode-box" data-mode="bike" onclick="setMode('bike')"><i data-lucide="bike"></i><span>자전거</span></div>
           </div>
-        </div>
-        <div class="form-item">
-          <span class="form-label">목적지</span>
-          <input type="text" id="dest" placeholder="도착 위치 입력">
-        </div>
-      </section>
+        </section>
 
-      <section>
-        <div class="section-title">시간 설정</div>
-        <div class="grid-2">
+        <section>
+          <div class="section-title">지도 모드</div>
+          <div class="map-cmd-grid">
+            <button class="cmd-btn active" id="cmd-none" onclick="setCmd('none')">일반</button>
+            <button class="cmd-btn" id="cmd-origin" onclick="setCmd('origin')">출발지 선택</button>
+            <button class="cmd-btn" id="cmd-dest" onclick="setCmd('dest')">목적지 선택</button>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-title">경로</div>
           <div class="form-item">
-            <span class="form-label">약속 시각</span>
-            <input type="text" id="appt-h" value="09:00" placeholder="00:00">
-          </div>
-          <div class="form-item">
-            <span class="form-label">준비 시간</span>
-            <input type="text" id="prep" value="30분">
-          </div>
-        </div>
-        <div class="grid-2">
-          <div class="form-item">
-            <span class="form-label">지각 습관</span>
-            <input type="text" id="bias" value="10분">
-          </div>
-          <div class="form-item">
-            <span class="form-label">1차 알림</span>
-            <input type="text" id="alarm" value="60분 전">
-          </div>
-        </div>
-      </section>
-
-      <button class="btn-calc" id="calc-btn" onclick="calculate()">경로 계산</button>
-      <button class="btn-demo" onclick="fillDemo()">데모 보기</button>
-
-      <div id="result-area">
-        <div class="section-title">분석 결과</div>
-        <div class="prob-panel">
-          <div class="prob-info">
-            <div class="prob-ring">
-              <svg viewBox="0 0 36 36">
-                <circle class="bg" cx="18" cy="18" r="15.9155"></circle>
-                <circle class="fg" id="arc" cx="18" cy="18" r="15.9155"></circle>
-              </svg>
+            <span class="form-label">출발지</span>
+            <div class="input-grp">
+              <input type="text" id="origin" placeholder="출발 위치 입력">
+              <button class="gps-btn" id="set-current-btn" onclick="setCurrentLocation()" title="현재 위치를 출발지로 설정"><i data-lucide="crosshair"></i></button>
             </div>
-            <div class="prob-text" id="prob-msg">분석 중...</div>
           </div>
+          <div class="form-item">
+            <span class="form-label">목적지</span>
+            <input type="text" id="dest" placeholder="도착 위치 입력">
+          </div>
+        </section>
+
+        <section>
+          <div class="section-title">시간 설정</div>
+          <div class="grid-2">
+            <div class="form-item">
+              <span class="form-label">약속 시각</span>
+              <input type="text" id="appt-h" value="09:00" placeholder="00:00">
+            </div>
+            <div class="form-item">
+              <span class="form-label">준비 시간</span>
+              <input type="text" id="prep" value="30">
+            </div>
+          </div>
+        </section>
+
+        <button class="btn-calc" id="calc-btn" onclick="calculate()">경로 계산</button>
+        <button class="btn-demo" onclick="fillDemo()">데모 보기</button>
+
+        <div id="result-area" style="display:none;">
+          <div class="section-title">지각 확률 분석</div>
+          <div class="summary-card" style="display:flex; flex-direction:column; align-items:center; padding:20px; margin-bottom:15px; background:var(--active-bg);">
+            <div style="position:relative; width:80px; height:80px; margin-bottom:10px;">
+              <svg viewBox="0 0 36 36" style="width:80px; height:80px; transform: rotate(-90deg);">
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#eee" stroke-width="3" />
+                <path id="arc" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--primary)" stroke-width="3" stroke-dasharray="100, 100" stroke-dashoffset="100" stroke-linecap="round" style="transition: stroke-dashoffset 1s ease-out;" />
+              </svg>
+              <div id="prob-msg" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center; font-size:11px; font-weight:700; width:100%; line-height:1.2;">0%</div>
+            </div>
+            <div id="status-text" style="font-size:12px; font-weight:500; color:var(--text-muted); text-align:center;">경로를 분석 중입니다...</div>
+          </div>
+          
+          <div class="section-title">상세 경로</div>
+          <div id="transit-details"></div>
         </div>
-        <div id="transit-details"></div>
+      </div>
+
+      <!-- 히스토리 탭 -->
+      <div id="tab-history" class="tab-content">
+        <section>
+          <div class="section-title">최근 경로 이력</div>
+          <div id="history-list" style="margin-top: 10px;">
+            <div style="text-align:center; color:#999; padding:40px 0; font-size:13px;">아직 기록이 없습니다.</div>
+          </div>
+        </section>
+      </div>
+
+      <!-- 설정 탭 -->
+      <div id="tab-settings" class="tab-content">
+        <section>
+          <div class="section-title">개인 설정</div>
+          <div class="form-item" style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="form-label">다크 모드</span>
+            <label class="switch">
+              <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode(this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+          
+          <div class="form-item" style="margin-top:20px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <span class="form-label">지각 확률 가중치</span>
+              <span id="weight-val" style="font-weight:700; color:var(--primary);">1.0</span>
+            </div>
+            <input type="range" id="detour-weight" min="1.0" max="2.0" step="0.1" value="1.0" style="width:100%;" oninput="updateWeight(this.value)">
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:#999; margin-top:4px;">
+              <span>표준 (1.0)</span>
+              <span>보수적 (2.0)</span>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-title">선호 교통수단</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 4px 0;">
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+              <input type="checkbox" id="pref-subway" checked style="width:16px; height:16px;"> 지하철 우선
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+              <input type="checkbox" id="pref-bus" checked style="width:16px; height:16px;"> 버스 포함
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+              <input type="checkbox" id="pref-village" style="width:16px; height:16px;"> 마을버스 제외
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+              <input type="checkbox" id="pref-express" style="width:16px; height:16px;"> 급행 위주
+            </label>
+          </div>
+        </section>
       </div>
     </aside>
 
@@ -282,6 +356,44 @@
     lucide.createIcons();
     const map = L.map('map', {zoomControl: false}).setView([37.5665, 126.978], 12);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+    // 탭 전환 기능
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.toggle('active', b.innerText.includes(tab === 'calculate' ? '경로' : (tab === 'history' ? '히스토리' : '설정')));
+      });
+    }
+
+    // 설정 관련 기능
+    function toggleDarkMode(isDark) {
+      document.body.classList.toggle('dark-mode', isDark);
+      localStorage.setItem('darkMode', isDark);
+    }
+
+    function updateWeight(val) {
+      document.getElementById('weight-val').innerText = val + 'x';
+      localStorage.setItem('detourWeight', val);
+    }
+
+    // 초기 설정 로드
+    window.onload = () => {
+      const isDark = localStorage.getItem('darkMode') === 'true';
+      if (isDark) {
+        document.getElementById('dark-mode-toggle').checked = true;
+        toggleDarkMode(true);
+      }
+      
+      const weight = localStorage.getItem('detourWeight') || '1.0';
+      document.getElementById('detour-weight').value = weight;
+      updateWeight(weight);
+
+      document.getElementById('clock').innerText = new Date().toTimeString().substring(0,5);
+      const t = new Date(Date.now() + 3600000);
+      document.getElementById('appt-h').value = String(t.getHours()).padStart(2,'0') + ':' + String(t.getMinutes()).padStart(2,'0');
+    };
 
     map.on('click', async (e) => {
       if (cmd === 'none') return;
@@ -344,8 +456,11 @@
     }
 
     async function calculate() {
-      const rawOrigin = document.getElementById('origin').value;
-      const rawDest = document.getElementById('dest').value;
+      console.log("Calculation starting...");
+      const originInput = document.getElementById('origin');
+      const destInput = document.getElementById('dest');
+      const rawOrigin = originInput ? originInput.value : "";
+      const rawDest = destInput ? destInput.value : "";
 
       if (rawOrigin !== lastOriginAddr) originCoords = null;
       if (rawDest !== lastDestAddr) destCoords = null;
@@ -353,41 +468,66 @@
       const originVal = rawOrigin.trim();
       const destVal = rawDest.trim();
 
-      if (!originVal || !destVal) { showToast("출발지와 목적지를 입력하거나 지도에서 선택해주세요"); return; }
+      if (!originVal || !destVal) { showToast("출발지와 목적지를 입력해주세요"); return; }
       
       const btn = document.getElementById('calc-btn');
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 계산 중...';
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
       btn.disabled = true;
 
-      const apptTime = new Date();
-      if (document.getElementById('appt-h').value.includes(':')) {
-          const [h, m] = document.getElementById('appt-h').value.split(':');
-          apptTime.setHours(parseInt(h));
-          apptTime.setMinutes(parseInt(m));
+      // 약속 시간 처리
+      const now = new Date();
+      let apptTime = new Date();
+      const timeStr = document.getElementById('appt-h').value;
+      try {
+          if (timeStr && timeStr.includes(':')) {
+              const [h, m] = timeStr.split(':');
+              apptTime.setHours(parseInt(h));
+              apptTime.setMinutes(parseInt(m));
+              apptTime.setSeconds(0);
+              if (apptTime < now) apptTime.setDate(apptTime.getDate() + 1);
+          }
+      } catch (e) {
+          console.error("Time parsing error", e);
       }
+      
+      const weightEl = document.getElementById('detour-weight');
+      const weightVal = weightEl ? parseFloat(weightEl.value) : 1.0;
+
+      const payload = {
+        origin: originVal, destination: destVal,
+        origin_lat: originCoords ? originCoords.lat : null,
+        origin_lng: originCoords ? originCoords.lng : null,
+        dest_lat: destCoords ? destCoords.lat : null,
+        dest_lng: destCoords ? destCoords.lng : null,
+        appointment_time: apptTime.toISOString(),
+        prep_time: parseInt(document.getElementById('prep').value) || 20,
+        lateness_bias: 10,
+        mode: mode,
+        detour_weight: weightVal,
+        transit_prefs: {
+            subway_priority: document.getElementById('pref-subway')?.checked || false,
+            bus_include: document.getElementById('pref-bus')?.checked || false,
+            no_village_bus: document.getElementById('pref-village')?.checked || false,
+            express_focus: document.getElementById('pref-express')?.checked || false
+        }
+      };
+
+      console.log("Sending payload:", payload);
       
       try {
         const response = await fetch('/api/calculate', {
           method: 'POST', headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({
-            origin: originVal, destination: destVal,
-            origin_lat: originCoords ? originCoords.lat : null,
-            origin_lng: originCoords ? originCoords.lng : null,
-            dest_lat: destCoords ? destCoords.lat : null,
-            dest_lng: destCoords ? destCoords.lng : null,
-            appointment_time: apptTime.toISOString().slice(0, 19).replace('T', ' '),
-            prep_time: parseInt(document.getElementById('prep').value) || 0,
-            lateness_bias: parseInt(document.getElementById('bias').value) || 0,
-            mode: mode
-          })
+          body: JSON.stringify(payload)
         });
         
         if (!response.ok) {
             const errData = await response.json();
-            throw new Error(errData.detail || "서버 응답 오류");
+            console.error("Server error:", errData);
+            throw new Error(errData.detail || "서버 오류 (422/500)");
         }
         
         const res = await response.json();
+        console.log("Server response:", res);
         lastData = res;
         display(res);
       } catch (e) { 
@@ -401,16 +541,34 @@
       if (d.origin_coords) setO(d.origin_coords.lat, d.origin_coords.lng, document.getElementById('origin').value);
       if (d.dest_coords) setD(d.dest_coords.lat, d.dest_coords.lng, document.getElementById('dest').value);
 
-      document.getElementById('result-area').style.display = 'block';
-      document.getElementById('summary-card').style.display = 'block';
+      saveToHistory(d);
+
+      const resArea = document.getElementById('result-area');
+      if (resArea) resArea.style.display = 'block';
+      
+      const sumCard = document.getElementById('summary-card');
+      if (sumCard) sumCard.style.display = 'block';
       
       const pct = Math.round(d.late_probability * 100);
-      document.getElementById('arc').style.strokeDashoffset = 100 - pct;
-      document.getElementById('prob-msg').innerText = `${pct}% 지각 확률\n${d.message}`;
+      const arcEl = document.getElementById('arc');
+      if (arcEl) arcEl.style.strokeDashoffset = 100 - pct;
       
-      document.getElementById('f-time').innerText = d.travel_time + "분";
-      document.getElementById('f-dist').innerText = (d.distance_km || 0) + "km";
-      document.getElementById('f-arr').innerText = d.expected_arrival_time.split('T')[1].substring(0, 5);
+      const probMsgEl = document.getElementById('prob-msg');
+      if (probMsgEl) probMsgEl.innerText = `${pct}%`;
+      
+      const statusTextEl = document.getElementById('status-text');
+      if (statusTextEl) statusTextEl.innerText = d.message || "분석 완료";
+      
+      const timeEl = document.getElementById('f-time');
+      if (timeEl) timeEl.innerText = d.travel_time + "분";
+      
+      const distEl = document.getElementById('f-dist');
+      if (distEl) distEl.innerText = (d.distance_km || 0) + "km";
+      
+      const arrEl = document.getElementById('f-arr');
+      if (arrEl && d.expected_arrival_time) {
+          arrEl.innerText = d.expected_arrival_time.split('T')[1].substring(0, 5);
+      }
 
       const dBox = document.getElementById('transit-details');
       dBox.innerHTML = '';
@@ -494,7 +652,7 @@
       if (activeLayer) map.removeLayer(activeLayer);
       if (routeLine) map.removeLayer(routeLine);
       if (d.route_points && d.route_points.length > 0) {
-        routeLine = L.polyline(d.route_points.map(p=>[p.lat,p.lng]), {color:'#1e3a29', weight: 6, dashArray: '12, 18', opacity: 0.9}).addTo(map);
+        routeLine = L.polyline(d.route_points.map(p=>[p.lat,p.lng]), {color: getComputedStyle(document.body).getPropertyValue('--primary'), weight: 6, dashArray: '12, 18', opacity: 0.9}).addTo(map);
         map.fitBounds(routeLine.getBounds(), {padding:[40,40]});
       } else if (originCoords && destCoords) {
         map.fitBounds(L.latLngBounds([originCoords.lat, originCoords.lng], [destCoords.lat, destCoords.lng]), {padding:[40,40]});
@@ -534,9 +692,7 @@
 
     function toggleGPS() {
       if (!navigator.geolocation) { showToast("브라우저가 위치 정보를 지원하지 않습니다."); return; }
-      
       const btn = document.getElementById('map-gps-btn');
-      
       if (isTracking) {
         navigator.geolocation.clearWatch(watchId);
         if (userLocationMarker) map.removeLayer(userLocationMarker);
@@ -545,37 +701,21 @@
         showToast("실시간 위치 추적을 종료합니다.");
         return;
       }
-
       showToast("실시간 위치 추적을 시작합니다...");
       isTracking = true;
       btn.classList.add('active');
-
       watchId = navigator.geolocation.watchPosition(
         p => {
-          const lat = p.coords.latitude;
-          const lng = p.coords.longitude;
-          const pos = [lat, lng];
-
+          const pos = [p.coords.latitude, p.coords.longitude];
           if (!userLocationMarker) {
             userLocationMarker = L.marker(pos, {
-              icon: L.divIcon({ 
-                className: 'user-location-dot', 
-                html: '<div style="position:relative;"><div style="position:absolute;top:-25px;left:-20px;background:#3498db;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;z-index:10001;">내 위치</div></div>',
-                iconSize: [16, 16], 
-                iconAnchor: [8, 8] 
-              }),
+              icon: L.divIcon({ className: 'user-location-dot', html: '<div style="position:relative;"><div style="position:absolute;top:-25px;left:-20px;background:#3498db;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;z-index:10001;">내 위치</div></div>', iconSize: [16, 16], iconAnchor: [8, 8] }),
               zIndexOffset: 10000
             }).addTo(map);
-          } else {
-            userLocationMarker.setLatLng(pos);
-          }
+          } else { userLocationMarker.setLatLng(pos); }
           if (isTracking) map.panTo(pos);
         },
-        err => {
-          showToast("위치 정보를 가져올 수 없습니다.");
-          isTracking = false;
-          btn.classList.remove('active');
-        },
+        err => { showToast("위치 정보를 가져올 수 없습니다."); isTracking = false; btn.classList.remove('active'); },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     }
@@ -585,36 +725,97 @@
       const btn = document.getElementById('set-current-btn');
       const originalIcon = btn.innerHTML;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      
       navigator.geolocation.getCurrentPosition(
         async p => {
-          const lat = p.coords.latitude;
-          const lng = p.coords.longitude;
+          const lat = p.coords.latitude; const lng = p.coords.longitude;
           const addr = await revGeo(lat, lng);
           setO(lat, lng, addr || "현재 위치");
           btn.innerHTML = originalIcon;
           showToast("현재 위치가 출발지로 설정되었습니다.");
         },
-        err => {
-          showToast("위치 정보를 가져올 수 없습니다.");
-          btn.innerHTML = originalIcon;
-        },
+        err => { showToast("위치 정보를 가져올 수 없습니다."); btn.innerHTML = originalIcon; },
         { enableHighAccuracy: true, timeout: 5000 }
       );
     }
 
-    const clearOrigin = () => { originCoords = null; lastOriginAddr = "MANUAL_EDIT"; };
-    const clearDest = () => { destCoords = null; lastDestAddr = "MANUAL_EDIT"; };
+    // === 히스토리 관련 기능 (긴급 추가) ===
+    function updateHistoryList() {
+      const history = JSON.parse(localStorage.getItem('route_history') || '[]');
+      const hList = document.getElementById('history-list');
+      if (!hList) return;
+      if (history.length === 0) {
+        hList.innerHTML = '<div style="text-align:center; color:#999; padding:40px 0; font-size:13px;">아직 기록이 없습니다.</div>';
+        return;
+      }
+      hList.innerHTML = history.map((item, idx) => `
+        <div class="transit-card" onclick="loadHistory(${idx})">
+          <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:4px;">
+            <b style="font-size:13px;">${item.dest}</b>
+            <span style="font-size:10px; color:#999;">${item.time}</span>
+          </div>
+          <div style="font-size:11px; color:#888; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            ${item.origin} → ${item.dest}
+          </div>
+        </div>
+      `).join('');
+    }
 
-    document.getElementById('origin').addEventListener('input', clearOrigin);
-    document.getElementById('dest').addEventListener('input', clearDest);
+    function saveToHistory(d) {
+      if (!d.origin_coords || !d.dest_coords) return;
+      let history = JSON.parse(localStorage.getItem('route_history') || '[]');
+      const newEntry = {
+        origin: document.getElementById('origin').value,
+        dest: document.getElementById('dest').value,
+        origin_coords: d.origin_coords,
+        dest_coords: d.dest_coords,
+        mode: d.mode,
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+      };
+      history = history.filter(h => h.dest !== newEntry.dest || h.origin !== newEntry.origin);
+      history.unshift(newEntry);
+      if (history.length > 10) history.pop();
+      localStorage.setItem('route_history', JSON.stringify(history));
+      updateHistoryList();
+    }
 
-    setInterval(() => { document.getElementById('clock').innerText = new Date().toTimeString().substring(0,5); }, 1000);
+    function loadHistory(idx) {
+      const history = JSON.parse(localStorage.getItem('route_history') || '[]');
+      const item = history[idx];
+      if (!item) return;
+      document.getElementById('origin').value = item.origin;
+      document.getElementById('dest').value = item.dest;
+      originCoords = item.origin_coords;
+      destCoords = item.dest_coords;
+      setMode(item.mode);
+      switchTab('calculate');
+      calculate();
+    }
+
     window.onload = () => {
+      const isDark = localStorage.getItem('darkMode') === 'true';
+      if (isDark) {
+        document.getElementById('dark-mode-toggle').checked = true;
+        toggleDarkMode(true);
+      }
+      const weight = localStorage.getItem('detourWeight') || '1.0';
+      if (document.getElementById('detour-weight')) {
+        document.getElementById('detour-weight').value = weight;
+        updateWeight(weight);
+      }
+      updateHistoryList();
       document.getElementById('clock').innerText = new Date().toTimeString().substring(0,5);
       const t = new Date(Date.now() + 3600000);
       document.getElementById('appt-h').value = String(t.getHours()).padStart(2,'0') + ':' + String(t.getMinutes()).padStart(2,'0');
     };
+
+    const clearOrigin = () => { originCoords = null; lastOriginAddr = "MANUAL_EDIT"; };
+    const clearDest = () => { destCoords = null; lastDestAddr = "MANUAL_EDIT"; };
+    document.getElementById('origin').addEventListener('input', clearOrigin);
+    document.getElementById('dest').addEventListener('input', clearDest);
+    setInterval(() => { 
+      const clockEl = document.getElementById('clock');
+      if (clockEl) clockEl.innerText = new Date().toTimeString().substring(0,5); 
+    }, 1000);
   </script>
 </body>
 </html>

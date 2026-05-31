@@ -47,8 +47,13 @@ class CalcRequest(BaseModel):
     dest_lng: Optional[float] = None
     appointment_time: str
     prep_time: int = 20
-    lateness_bias: int = 5
-    mode: str = "car"  # car, transit, walk, bike 추가
+    lateness_bias: int = 10
+    mode: str = "car"
+    detour_weight: Optional[float] = 1.0
+    transit_prefs: Optional[dict] = None
+
+    class Config:
+        extra = "allow"
 
 class SimRequest(BaseModel):
     travel_time: int
@@ -162,9 +167,9 @@ async def get_kakao_route(o_lat, o_lng, d_lat, d_lng):
     return None, [], 0
 
 # ── 모드별 이동시간 추정 모델 ──
-def estimate_by_mode(mode: str, straight_dist_km: float):
-    # 직선거리에 도심 굴곡도(도로망 우회율) 기본 1.3배 적용
-    real_dist = straight_dist_km * 1.3
+def estimate_by_mode(mode: str, straight_dist_km: float, detour_weight: float = 1.0):
+    # 직선거리에 가중치 적용 (기본 1.3배 * 사용자 설정 가중치)
+    real_dist = straight_dist_km * 1.3 * detour_weight
     
     if mode == "transit":
         # 대중교통: 평균 18km/h + 대기/환승 기본 10분
@@ -201,30 +206,55 @@ async def get_bus_realtime(station_id: int, bus_no: str):
         print(f"Bus realtime error: {e}")
     return None
 
-async def get_odsay_transit(o_lat, o_lng, d_lat, d_lng):
+async def get_odsay_transit(o_lat, o_lng, d_lat, d_lng, prefs=None):
     if not ODSAY_API_KEY:
         return None
+
+    # API 레벨 필터는 너무 깐깐해서 0(전체)으로 가져온 뒤 파이썬에서 고릅니다.
     enc_key = urllib.parse.quote(ODSAY_API_KEY)
-    url = f"https://api.odsay.com/v1/api/searchPubTransPathT?SX={o_lng}&SY={o_lat}&EX={d_lng}&EY={d_lat}&apiKey={enc_key}"
+    url = f"https://api.odsay.com/v1/api/searchPubTransPathT?SX={o_lng}&SY={o_lat}&EX={d_lng}&EY={d_lat}&apiKey={enc_key}&SearchType=0"
     try:
-        # ODsay API 키가 http://localhost/ 도메인으로 등록됨
-        # 백엔드 서버사이드 호출이므로 등록된 도메인 Referer 고정 사용
-        headers = {
-            'Referer': 'http://localhost/',
-        }
+        headers = {'Referer': 'http://localhost/'}
         async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as c:
             res = await c.get(url, headers=headers)
-            print(f"ODsay Status: {res.status_code}")
             data = res.json()
-            
-            # 인증 오류 감지
-            if "error" in data:
-                err = data['error'][0] if isinstance(data['error'], list) else data['error']
-                print(f"ODsay API Error: {err}")
-                return None
+            if "error" in data: return None
             
             if "result" in data and data["result"].get("path"):
-                paths = data["result"]["path"][:3]
+                original_paths = data["result"]["path"]
+                
+                # 프론트엔드 설정값 확인
+                subway_on = prefs.get("subway_priority", True) if prefs else True
+                bus_on = prefs.get("bus_include", True) if prefs else True
+                no_village = prefs.get("no_village_bus", False) if prefs else False
+                
+                paths = []
+                for p in original_paths:
+                    is_village = False
+                    has_bus = False
+                    has_subway = False
+                    
+                    for sub in p.get("subPath", []):
+                        t_type = sub.get("trafficType") # 1:subway, 2:bus, 3:walk
+                        if t_type == 2: 
+                            has_bus = True
+                            bus_no = ""
+                            for lane in sub.get("lane", []):
+                                bus_no += lane.get("busNo", "")
+                            if "마을버스" in bus_no: is_village = True
+                        if t_type == 1: has_subway = True
+
+                    # 필터링 로직
+                    if no_village and is_village: continue
+                    if not bus_on and has_bus and has_subway: continue # 버스 끄면 환승 경로 제외
+                    if not bus_on and has_bus and not has_subway: continue # 버스만 있는 경로 제외
+                    
+                    paths.append(p)
+
+                # 만약 필터링해서 아무것도 안 남으면, 사용자에게 보여주기 위해 다시 상위 결과 사용
+                if not paths: paths = original_paths[:3]
+                
+                paths = paths[:3] # 최대 3개
                 options = []
                 best_time = None
                 
@@ -310,26 +340,28 @@ async def get_odsay_transit(o_lat, o_lng, d_lat, d_lng):
         print("ODsay Error:", e)
     return None
 
-async def estimate_travel(o: tuple, d: tuple, mode: str):
+async def estimate_travel(o: tuple, d: tuple, mode: str, detour_weight: float = 1.0, transit_prefs: dict = None):
     st_dist = haversine(o[0], o[1], d[0], d[1])
     transit_info = None
 
     if mode == "car":
         t, pts, dist = await get_kakao_route(*o, *d)
         if t:
+            # 카카오 API는 자체적으로 경로 우회율이 반영되어 있음
             return t, True, o, d, pts, dist, None
             
     if mode == "transit":
-        od = await get_odsay_transit(o[0], o[1], d[0], d[1])
+        od = await get_odsay_transit(o[0], o[1], d[0], d[1], transit_prefs)
         if od:
             transit_info = od["options"]
-            est_t = od["time"]
+            # 대중교통도 API 결과 시간에 가중치 적용
+            est_t = round(od["time"] * detour_weight)
             est_dist = round(st_dist * 1.3, 1)
         else:
-            est_t, est_dist = estimate_by_mode(mode, st_dist)
+            est_t, est_dist = estimate_by_mode(mode, st_dist, detour_weight)
     else:
         # 도보, 자전거 등
-        est_t, est_dist = estimate_by_mode(mode, st_dist)
+        est_t, est_dist = estimate_by_mode(mode, st_dist, detour_weight)
     
     # 지도의 파란 선을 위해 OSRM에서 경로 점(pts)만 가져옵니다!
     pts = []
@@ -418,7 +450,13 @@ async def osrm_route(req: OSRMRequest):
 
 @app.post("/api/calculate")
 async def calculate(req: CalcRequest):
-    appt = datetime.fromisoformat(req.appointment_time)
+    # 날짜 형식 처리 (T나 공백 모두 허용하도록 9번째 줄 수정)
+    try:
+        appt_str = req.appointment_time.replace(' ', 'T')
+        appt = datetime.fromisoformat(appt_str)
+    except:
+        appt = datetime.now() + timedelta(hours=1)
+        
     now  = datetime.now()
     remaining = (appt - now).total_seconds() / 60
 
@@ -436,7 +474,7 @@ async def calculate(req: CalcRequest):
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="주소를 좌표로 변환할 수 없습니다. 지도 화면에서 위치를 직접 클릭하거나, '데모 보기' 버튼을 사용해주세요.")
 
-    travel, is_kakao, o_coords, d_coords, pts, dist, transit_info = await estimate_travel(o, d, req.mode)
+    travel, is_kakao, o_coords, d_coords, pts, dist, transit_info = await estimate_travel(o, d, req.mode, req.detour_weight, req.transit_prefs)
     prob    = calc_late_prob(travel, req.prep_time, req.lateness_bias, remaining)
     rec_dep = rec_depart(appt, travel, req.prep_time, req.lateness_bias)
     arrival = now + timedelta(minutes=travel)
